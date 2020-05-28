@@ -1,18 +1,15 @@
-package matwojcik.stock.portfolio
+package matwojcik.stock.portfolio.domain
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 import matwojcik.stock.domain.Stock
 import matwojcik.stock.domain.Stock.Quantity
-import matwojcik.stock.portfolio.domain.Holding
-import matwojcik.stock.portfolio.domain.Portfolio
-import matwojcik.stock.portfolio.domain.Transaction
 import matwojcik.stock.portfolio.domain.Portfolio.failures.NotEnoughBalance
-import org.scalatest.EitherValues
-import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.EitherValues
+import org.scalatest.GivenWhenThen
 
 class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with EitherValues {
 

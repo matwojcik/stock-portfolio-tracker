@@ -1,6 +1,5 @@
 package matwojcik.stock.portfolio.domain
 
-import java.time.ZonedDateTime
 import java.util.UUID
 
 import cats.implicits._

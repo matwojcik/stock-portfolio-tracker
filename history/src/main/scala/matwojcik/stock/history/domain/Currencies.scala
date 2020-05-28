@@ -2,7 +2,6 @@ package matwojcik.stock.history.domain
 
 import java.time.LocalDate
 
-import io.estatico.newtype.macros.newtype
 import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.CurrencyRate
 
