@@ -1,15 +1,16 @@
-package matwojcik.stock.portfolio
+package matwojcik.stock.portfolio.domain
 
 import java.time.ZonedDateTime
+import java.util.UUID
 
-import io.estatico.newtype.macros.newtype
 import cats.implicits._
+import io.estatico.newtype.macros.newtype
 import matwojcik.stock.domain.Stock
 import matwojcik.stock.domain.Stock.Quantity
-import matwojcik.stock.portfolio.Portfolio.failures.NotEnoughBalance
-import matwojcik.stock.portfolio.Transaction.Type
+import matwojcik.stock.portfolio.domain.Portfolio.failures.NotEnoughBalance
+import matwojcik.stock.portfolio.domain.Transaction.Type
 
-case class Portfolio private (private val holdings: Map[Stock.Id, Holding]) {
+case class Portfolio private (id: Portfolio.Id, private val holdings: Map[Stock.Id, Holding]) {
 
   def addTransaction(transaction: Transaction): Either[NotEnoughBalance, Portfolio] = {
     val stock = transaction.stock
@@ -27,7 +28,7 @@ case class Portfolio private (private val holdings: Map[Stock.Id, Holding]) {
     }
 
     newHolding.map(holding =>
-      Portfolio(holdings = (holdings + (stock -> holding)).filter { case (_, holding) => holding.balance.value > 0 })
+      Portfolio(id = id, holdings = (holdings + (stock -> holding)).filter { case (_, holding) => holding.balance.value > 0 })
     )
   }
 
@@ -40,7 +41,13 @@ case class Portfolio private (private val holdings: Map[Stock.Id, Holding]) {
 }
 
 object Portfolio {
-  def empty: Portfolio = Portfolio(Map.empty)
+  def empty: Portfolio = Portfolio(id = Id.create, Map.empty)
+
+  @newtype case class Id(value: String)
+
+  object Id {
+    def create: Id = Id(UUID.randomUUID().toString)
+  }
 
   object failures {
     case class NotEnoughBalance(stock: Stock.Id)
@@ -48,17 +55,3 @@ object Portfolio {
 }
 
 case class Holding(stock: Stock.Id, balance: Quantity)
-
-case class Transaction(id: Transaction.Id, stock: Stock.Id, tpe: Transaction.Type, quantity: Quantity, date: ZonedDateTime)
-
-object Transaction {
-  @newtype case class Id(value: String)
-
-  sealed trait Type extends Product with Serializable
-
-  object Type {
-    case object Buy extends Type
-    case object Sell extends Type
-  }
-
-}

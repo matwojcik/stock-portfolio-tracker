@@ -30,7 +30,8 @@ lazy val dependencies = {
     "org.typelevel" %% "cats-effect" % "2.1.3",
     "org.typelevel" %% "cats-mtl-core" % "0.7.0",
     "com.github.mpilquist" %% "simulacrum" % "0.19.0",
-    "org.typelevel" %% "cats-tagless-macros" % "0.11"
+    "org.typelevel" %% "cats-tagless-macros" % "0.11",
+    "co.fs2" %% "fs2-core" % "2.2.1"
   )
 
   val config = Seq(

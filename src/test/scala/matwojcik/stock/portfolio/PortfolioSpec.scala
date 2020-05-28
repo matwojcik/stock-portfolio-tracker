@@ -5,7 +5,10 @@ import java.time.ZonedDateTime
 
 import matwojcik.stock.domain.Stock
 import matwojcik.stock.domain.Stock.Quantity
-import matwojcik.stock.portfolio.Portfolio.failures.NotEnoughBalance
+import matwojcik.stock.portfolio.domain.Holding
+import matwojcik.stock.portfolio.domain.Portfolio
+import matwojcik.stock.portfolio.domain.Transaction
+import matwojcik.stock.portfolio.domain.Portfolio.failures.NotEnoughBalance
 import org.scalatest.EitherValues
 import org.scalatest.GivenWhenThen
 import org.scalatest.featurespec.AnyFeatureSpec
