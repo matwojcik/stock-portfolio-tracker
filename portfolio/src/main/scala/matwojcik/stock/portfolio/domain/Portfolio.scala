@@ -2,14 +2,23 @@ package matwojcik.stock.portfolio.domain
 
 import java.util.UUID
 
+import cats.effect.Sync
 import cats.implicits._
 import io.estatico.newtype.macros.newtype
+import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.Stock
 import matwojcik.stock.domain.Stock.Quantity
+import matwojcik.stock.portfolio.domain.Portfolio.PortfolioRecreationFailure.DomainFailure
+import matwojcik.stock.portfolio.domain.Portfolio.PortfolioRecreationFailure.DuplicateCreationEvent
+import matwojcik.stock.portfolio.domain.Portfolio.PortfolioRecreationFailure.EventNotFromPortfolio
 import matwojcik.stock.portfolio.domain.Portfolio.failures.NotEnoughBalance
 import matwojcik.stock.portfolio.domain.Transaction.Type
+import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent
+import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.CurrencyChanged
+import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.PortfolioCreated
+import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.TransactionAdded
 
-case class Portfolio private (id: Portfolio.Id, private val holdings: Map[Stock.Id, Holding]) {
+case class Portfolio private (id: Portfolio.Id, currency: Currency, private val holdings: Map[Stock.Id, Holding]) {
 
   def addTransaction(transaction: Transaction): Either[NotEnoughBalance, Portfolio] = {
     val stock = transaction.stock
@@ -27,12 +36,17 @@ case class Portfolio private (id: Portfolio.Id, private val holdings: Map[Stock.
     }
 
     newHolding.map(holding =>
-      Portfolio(id = id, holdings = (holdings + (stock -> holding)).filter { case (_, holding) => holding.balance.value > 0 })
+      Portfolio(id = id, currency = currency, holdings = (holdings + (stock -> holding)).filter {
+        case (_, holding) => holding.balance.value > 0
+      })
     )
   }
 
   private def addStock(stock: Stock.Id, quantity: Quantity) =
     holdings.get(stock).fold(Holding(stock, quantity))(holding => holding.copy(balance = holding.balance plus quantity))
+
+  def changeCurrency(newCurrency: Currency): Portfolio =
+    Portfolio(id, newCurrency, holdings)
 
   def activeHoldings: List[Holding] = holdings.values.toList
 
@@ -40,12 +54,40 @@ case class Portfolio private (id: Portfolio.Id, private val holdings: Map[Stock.
 }
 
 object Portfolio {
-  def empty: Portfolio = Portfolio(id = Id.create, Map.empty)
+  def empty[F[_]: Sync](currency: Currency): F[Portfolio] = Id.create.map(Portfolio.empty(_, currency))
+  def empty(id: Portfolio.Id, currency: Currency): Portfolio = Portfolio(id, currency, Map.empty)
+
+  def fromEvents(creation: PortfolioCreated, events: List[PortfolioDomainEvent]): Either[PortfolioRecreationFailure, Portfolio] =
+    events.foldM[Either[PortfolioRecreationFailure, *], Portfolio](Portfolio.empty(creation.id, creation.currency)) {
+      case (portfolio, event) =>
+        event match {
+          case e: PortfolioCreated =>
+            DuplicateCreationEvent(e).asLeft[Portfolio]
+          case e @ PortfolioDomainEvent.TransactionAdded(id, transaction) =>
+            if (id == portfolio.id)
+              portfolio.addTransaction(transaction).leftMap(DomainFailure)
+            else
+              EventNotFromPortfolio(e).asLeft[Portfolio]
+          case e @ CurrencyChanged(portfolioId, currency) =>
+            if (portfolioId == portfolio.id)
+              portfolio.changeCurrency(currency).asRight[PortfolioRecreationFailure]
+            else
+              EventNotFromPortfolio(e).asLeft[Portfolio]
+        }
+    }
+
+  sealed trait PortfolioRecreationFailure extends Product with Serializable
+
+  object PortfolioRecreationFailure {
+    case class DuplicateCreationEvent(event: PortfolioCreated) extends PortfolioRecreationFailure
+    case class EventNotFromPortfolio(event: PortfolioDomainEvent) extends PortfolioRecreationFailure
+    case class DomainFailure(reason: NotEnoughBalance) extends PortfolioRecreationFailure
+  }
 
   @newtype case class Id(value: String)
 
   object Id {
-    def create: Id = Id(UUID.randomUUID().toString)
+    def create[F[_]: Sync]: F[Id] = Sync[F].delay(Id(UUID.randomUUID().toString))
   }
 
   object failures {

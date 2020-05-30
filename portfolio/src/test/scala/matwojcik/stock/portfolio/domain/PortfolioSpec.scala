@@ -3,7 +3,9 @@ package matwojcik.stock.portfolio.domain
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+import cats.effect.IO
 import cats.scalatest.EitherValues
+import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.Stock
 import matwojcik.stock.domain.Stock.Quantity
 import matwojcik.stock.portfolio.domain.Portfolio.failures.NotEnoughBalance
@@ -14,10 +16,11 @@ import org.scalatest.GivenWhenThen
 class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with EitherValues {
 
   val someDate: ZonedDateTime = ZonedDateTime.of(2020, 2, 2, 10, 0, 0, 0, ZoneId.of("Z"))
+  val emptyPortfolio: Portfolio = Portfolio.empty[IO](Currency("PLN")).unsafeRunSync()
 
   Feature("Adding buy transaction") {
     Scenario("Empty portfolio") {
-      val portfolio = Portfolio.empty
+      val portfolio = emptyPortfolio
 
       When("New buy transaction is added")
       val transaction = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Buy, Stock.Quantity(10), someDate)
@@ -28,9 +31,9 @@ class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with
     }
 
     Scenario("Existing holding") {
-      When("Portfolio contains holding for stock")
+      Given("Portfolio contains holding for stock")
       val transaction1 = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Buy, Stock.Quantity(10), someDate)
-      val portfolio = Portfolio.empty.addTransaction(transaction1)
+      val portfolio = emptyPortfolio.addTransaction(transaction1)
 
       When("New buy transaction of the same stock is added")
       val transaction2 = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Buy, Stock.Quantity(5), someDate)
@@ -44,9 +47,9 @@ class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with
     }
 
     Scenario("New holding") {
-      When("Portfolio has some holding")
+      Given("Portfolio has some holding")
       val transaction1 = Transaction(Transaction.Id("2"), Stock.Id("CDP"), Transaction.Type.Buy, Stock.Quantity(10), someDate)
-      val portfolio = Portfolio.empty.addTransaction(transaction1)
+      val portfolio = emptyPortfolio.addTransaction(transaction1)
 
       When("New buy transaction of different stock is added")
       val transaction2 = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Buy, Stock.Quantity(5), someDate)
@@ -63,7 +66,7 @@ class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with
   Feature("Adding sell transaction") {
     Scenario("No such stock") {
       Given("Portfolio is empty")
-      val portfolio = Portfolio.empty
+      val portfolio = emptyPortfolio
 
       When("New sell transaction is added")
       val transaction = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Sell, Stock.Quantity(10), someDate)
@@ -74,9 +77,9 @@ class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with
     }
 
     Scenario("Not enough stock") {
-      When("Portfolio has some holding")
+      Given("Portfolio has some holding")
       val transaction1 = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Buy, Stock.Quantity(5), someDate)
-      val portfolio = Portfolio.empty.addTransaction(transaction1)
+      val portfolio = emptyPortfolio.addTransaction(transaction1)
 
       When("New sell transaction is added which exceeds holding")
       val transaction2 = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Sell, Stock.Quantity(10), someDate)
@@ -87,9 +90,9 @@ class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with
     }
 
     Scenario("Just enough stock") {
-      When("Portfolio has some holding")
+      Given("Portfolio has some holding")
       val transaction1 = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Buy, Stock.Quantity(5), someDate)
-      val portfolio = Portfolio.empty.addTransaction(transaction1)
+      val portfolio = emptyPortfolio.addTransaction(transaction1)
 
       When("New sell transaction is added which equals holding")
       val transaction2 = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Sell, Stock.Quantity(5), someDate)
@@ -100,9 +103,9 @@ class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with
     }
 
     Scenario("More than enough stock") {
-      When("Portfolio has some holding")
+      Given("Portfolio has some holding")
       val transaction1 = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Buy, Stock.Quantity(6), someDate)
-      val portfolio = Portfolio.empty.addTransaction(transaction1)
+      val portfolio = emptyPortfolio.addTransaction(transaction1)
 
       When("New sell transaction is added which is less than holding")
       val transaction2 = Transaction(Transaction.Id("1"), Stock.Id("OCDO"), Transaction.Type.Sell, Stock.Quantity(5), someDate)
