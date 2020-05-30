@@ -20,6 +20,8 @@ lazy val coreDependencies = {
     "org.typelevel" %% "cats-mtl-core" % "0.7.1",
     "com.github.mpilquist" %% "simulacrum" % "0.19.0",
     "org.typelevel" %% "cats-tagless-macros" % "0.11",
+    "com.olegpy" %% "meow-mtl-core" % "0.4.0",
+    "com.olegpy" %% "meow-mtl-effects" % "0.4.0",
     "co.fs2" %% "fs2-core" % "2.3.0"
   )
   val logging = Seq(

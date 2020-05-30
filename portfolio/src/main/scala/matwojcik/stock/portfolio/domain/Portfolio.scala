@@ -2,8 +2,11 @@ package matwojcik.stock.portfolio.domain
 
 import java.util.UUID
 
+import cats.data.Chain
 import cats.effect.Sync
 import cats.implicits._
+import com.olegpy.meow.prelude._
+import cats.mtl.FunctorTell
 import io.estatico.newtype.macros.newtype
 import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.Stock
@@ -58,7 +61,7 @@ object Portfolio {
   def empty(id: Portfolio.Id, currency: Currency): Portfolio = Portfolio(id, currency, Map.empty)
 
   def fromEvents(creation: PortfolioCreated, events: List[PortfolioDomainEvent]): Either[PortfolioRecreationFailure, Portfolio] =
-    events.foldM[Either[PortfolioRecreationFailure, *], Portfolio](Portfolio.empty(creation.id, creation.currency)) {
+    events.foldM[Either[PortfolioRecreationFailure, *], Portfolio](Portfolio.empty(creation.portfolioId, creation.currency)) {
       case (portfolio, event) =>
         event match {
           case e: PortfolioCreated =>
@@ -75,6 +78,27 @@ object Portfolio {
               EventNotFromPortfolio(e).asLeft[Portfolio]
         }
     }
+
+  object commands {
+
+    type EventLog[F[_]] = FunctorTell[F, Chain[PortfolioDomainEvent]]
+
+    def create[F[_]](id: Portfolio.Id, currency: Currency)(implicit Events: EventLog[F]): F[Portfolio] =
+      Events.tell(Chain.one(PortfolioCreated(id, currency))).as(Portfolio.empty(id, currency))
+
+    def changeCurrency[F[_]](portfolio: Portfolio)(newCurrency: Currency)(implicit Events: EventLog[F]): F[Portfolio] =
+      Events.tell(Chain.one(CurrencyChanged(portfolio.id, newCurrency))).as(portfolio.changeCurrency(newCurrency))
+
+    def addTransaction[F[_]](
+      portfolio: Portfolio
+    )(
+      transaction: Transaction
+    )(
+      implicit Events: EventLog[F]
+    ): Either[NotEnoughBalance, F[Portfolio]] =
+      portfolio.addTransaction(transaction).map(p => Events.tell(Chain.one(TransactionAdded(portfolio.id, transaction))).as(p))
+
+  }
 
   sealed trait PortfolioRecreationFailure extends Product with Serializable
 

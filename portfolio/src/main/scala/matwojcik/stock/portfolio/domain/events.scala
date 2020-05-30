@@ -4,14 +4,15 @@ import matwojcik.stock.domain.Currency
 
 object events {
 
-  sealed trait PortfolioDomainEvent extends Product with Serializable
+  sealed trait PortfolioDomainEvent extends Product with Serializable {
+    def portfolioId: Portfolio.Id
+  }
 
   object PortfolioDomainEvent {
-
-    case class PortfolioCreated(id: Portfolio.Id, currency: Currency) extends PortfolioDomainEvent
-    case class TransactionAdded(portfolio: Portfolio.Id, transaction: Transaction) extends PortfolioDomainEvent
-    case class CurrencyChanged(portfolio: Portfolio.Id, currency: Currency) extends PortfolioDomainEvent
-
+    // TODO make them private somehow
+    case class PortfolioCreated(portfolioId: Portfolio.Id, currency: Currency) extends PortfolioDomainEvent
+    case class TransactionAdded(portfolioId: Portfolio.Id, transaction: Transaction) extends PortfolioDomainEvent
+    case class CurrencyChanged(portfolioId: Portfolio.Id, currency: Currency) extends PortfolioDomainEvent
   }
 
 }
