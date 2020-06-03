@@ -80,8 +80,8 @@ lazy val root = (project in file("."))
     rootDependencies,
     testSettings
   )
-  .aggregate(core, portfolio, history, prices, importing, taxes)
-  .dependsOn(portfolio, history, prices, importing, taxes)
+  .aggregate(core, portfolio, history, reporting, prices, importing, taxes)
+  .dependsOn(portfolio, history, reporting, prices, importing, taxes)
 
 lazy val core = (project in file("core")).settings(
   name := "stock-portfolio-tracker-core",
@@ -105,6 +105,16 @@ lazy val portfolio = (project in file("portfolio"))
 lazy val history = (project in file("history"))
   .settings(
     name := "stock-portfolio-tracker-history",
+    commonSettings,
+    compilerPlugins,
+    compilerOptions,
+    testSettings
+  )
+  .dependsOn(core)
+
+lazy val reporting = (project in file("reporting"))
+  .settings(
+    name := "stock-portfolio-tracker-reporting",
     commonSettings,
     compilerPlugins,
     compilerOptions,

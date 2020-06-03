@@ -10,7 +10,8 @@ Despite being single app, strong modularisation has been introduced to better se
 - [importing](importing) - responsible for import of transactions from external model (e.g. csv)
 - [portfolio](portfolio) - managing portfolio of stock holdings
 - [prices](prices) - responsible for obtaining and keeping stock prices
-- [history](history) - reporting of portfolio value and its change in history
+- [history](history) - keeping portfolio value in history
+- [reporting](reporting) - reporting of portfolio value
 - [taxes](taxes) - tax calculations
 - [root](src) - cross module features, application entry point
  
