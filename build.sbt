@@ -1,5 +1,5 @@
 lazy val commonSettings = Seq(
-  scalaVersion := "2.13.3"
+  scalaVersion := "2.13.4"
 )
 
 val compilerPlugins = Seq(
@@ -58,11 +58,12 @@ lazy val rootDependencies = {
 
 lazy val testSettings = {
   val dependencies = {
-    libraryDependencies ++= Seq(
+    libraryDependencies ++= ((if (scalaVersion.value.startsWith("2.")) Seq("com.ironcorelabs" %% "cats-scalatest" % "3.1.1")
+                              else Seq.empty) ++ Seq(
       "org.scalactic" %% "scalactic" % "3.2.3",
-      "org.scalatest" %% "scalatest" % "3.2.3",
-      "com.ironcorelabs" %% "cats-scalatest" % "3.1.1"
-    ).map(_ % Test)
+      "org.scalatest" %% "scalatest" % "3.2.3"
+    )).map(_ % Test)
+
   }
 
   Seq(
@@ -80,6 +81,7 @@ lazy val root = (project in file("."))
     rootDependencies,
     testSettings
   )
+  .settings(scalacOptions += "-Ytasty-reader")
   .aggregate(core, portfolio, history, reporting, prices, importing, taxes)
   .dependsOn(portfolio, history, reporting, prices, importing, taxes)
 
@@ -146,8 +148,8 @@ lazy val taxes = (project in file("taxes"))
   .settings(
     name := "stock-portfolio-tracker-taxes",
     commonSettings,
-    compilerPlugins,
     compilerOptions,
     testSettings
   )
+  .settings(scalaVersion := "3.0.0-M3")
   .dependsOn(core)
