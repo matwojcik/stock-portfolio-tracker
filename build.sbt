@@ -1,10 +1,10 @@
 lazy val commonSettings = Seq(
-  scalaVersion := "2.13.2"
+  scalaVersion := "2.13.3"
 )
 
 val compilerPlugins = Seq(
-  addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full),
-  addCompilerPlugin("com.kubukoz" % "better-tostring" % "0.2.2" cross CrossVersion.full),
+  addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full),
+  addCompilerPlugin("com.kubukoz" % "better-tostring" % "0.2.6" cross CrossVersion.full),
   addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
 )
 
@@ -15,13 +15,13 @@ val compilerOptions = Seq(
 
 lazy val coreDependencies = {
   val cats = Seq(
-    "org.typelevel" %% "cats-core" % "2.1.0",
-    "org.typelevel" %% "cats-effect" % "2.1.3",
+    "org.typelevel" %% "cats-core" % "2.3.1",
+    "org.typelevel" %% "cats-effect" % "2.3.0",
     "org.typelevel" %% "cats-mtl-core" % "0.7.1",
     "com.github.mpilquist" %% "simulacrum" % "0.19.0",
-    "org.typelevel" %% "cats-tagless-macros" % "0.11",
-    "com.olegpy" %% "meow-mtl-core" % "0.4.0",
-    "com.olegpy" %% "meow-mtl-effects" % "0.4.0",
+    "org.typelevel" %% "cats-tagless-macros" % "0.12",
+    "com.olegpy" %% "meow-mtl-core" % "0.4.1",
+    "com.olegpy" %% "meow-mtl-effects" % "0.4.1",
     "co.fs2" %% "fs2-core" % "2.3.0"
   )
   val logging = Seq(
@@ -42,8 +42,8 @@ lazy val coreDependencies = {
 lazy val rootDependencies = {
   val CirceVersion = "0.13.0"
   val config = Seq(
-    "com.github.pureconfig" %% "pureconfig" % "0.12.3",
-    "eu.timepit" %% "refined-pureconfig" % "0.9.14"
+    "com.github.pureconfig" %% "pureconfig" % "0.14.0",
+    "eu.timepit" %% "refined-pureconfig" % "0.9.20"
   )
 
   val circe = Seq(
@@ -59,9 +59,9 @@ lazy val rootDependencies = {
 lazy val testSettings = {
   val dependencies = {
     libraryDependencies ++= Seq(
-      "org.scalactic" %% "scalactic" % "3.1.2",
-      "org.scalatest" %% "scalatest" % "3.1.2",
-      "com.ironcorelabs" %% "cats-scalatest" % "3.0.5"
+      "org.scalactic" %% "scalactic" % "3.2.3",
+      "org.scalatest" %% "scalatest" % "3.2.3",
+      "com.ironcorelabs" %% "cats-scalatest" % "3.1.1"
     ).map(_ % Test)
   }
 
