@@ -1,8 +1,8 @@
 package matwojcik.stock.taxes.domain
 
 import cats.Applicative
-import cats.syntax.all._
 import cats.data.NonEmptyList
+import cats.syntax.all._
 import matwojcik.stock.domain.Stock.Quantity
 import matwojcik.stock.taxes.domain.Income.SoldPosition
 
@@ -20,35 +20,59 @@ object SoldPositions {
     new SoldPositions[F] {
 
       override def findSoldPositions(year: Year, zone: ZoneId, transactions: NonEmptyList[Transaction]): F[List[SoldPosition]] = {
-
+        // todo find a way to make sure that all transactions have unique id
         val sortedTransactions = transactions.sortBy(_.date.toEpochMilli)
 
         val result = sortedTransactions.foldLeft(Acc.empty) {
           case (Acc(soldPositions, transactions), transaction) =>
-            if (transaction.date.atZone(zone).getYear != year.getValue || transaction.tpe != Transaction.Type.Sell)
+            if (transaction.tpe != Transaction.Type.Sell)
               Acc(soldPositions, transactions :+ transaction)
             else {
-              val buyTransactions = NonEmptyList.fromListUnsafe { // todo fixme
-                transactions
-                  .filter(_.stock == transaction.stock)
-                  .filter(_.tpe == Transaction.Type.Buy)
-                  .foldLeft(List.empty[Transaction]) {
-                    case (bought, buyTransaction) =>
-                      val currentQuantity = bought.map(_.quantity.value).fold(0)(_ + _)
-                      val quantityFromCurrentTransaction = Integer.min(buyTransaction.quantity.value, transaction.quantity.value - currentQuantity)
-                      if (quantityFromCurrentTransaction > 0)
-                        bought :+ buyTransaction.copy(quantity = Quantity(quantityFromCurrentTransaction))
-                      else bought
-                  }
-              }
-              // todo check if sum of bought = sold
-              val soldPosition = SoldPosition(transaction, buyTransactions)
-              Acc(soldPositions :+ soldPosition, transactions)
+              val buyTransactions = findBuyTransactions(transaction, transactions)
+              val transactionsWithoutAlreadyBought = excludeTransactionsTakenByCurrentSellTransaction(transactions, buyTransactions)
+
+              if (isTransactionFromThatYear(transaction, year, zone)) {
+                // todo check if sum of bought = sold
+                val soldPosition = SoldPosition(transaction, buyTransactions)
+
+                Acc(soldPositions :+ soldPosition, transactionsWithoutAlreadyBought)
+              } else
+                Acc(soldPositions, transactionsWithoutAlreadyBought)
             }
         }
 
         result.soldPositions.pure[F]
       }
+
+      private def isTransactionFromThatYear(transaction: Transaction, year: Year, zone: ZoneId) =
+        transaction.date.atZone(zone).getYear == year.getValue
+
+      private def findBuyTransactions(sellTransaction: Transaction, allPreviousTransactions: List[Transaction]) =
+        NonEmptyList.fromListUnsafe { // todo fixme
+          allPreviousTransactions
+            .filter(_.stock == sellTransaction.stock)
+            .filter(_.tpe == Transaction.Type.Buy)
+            .foldLeft(List.empty[Transaction]) {
+              case (bought, buyTransaction) =>
+                val currentQuantity = bought.map(_.quantity.value).sum
+                val quantityFromCurrentTransaction =
+                  Integer.min(buyTransaction.quantity.value, sellTransaction.quantity.value - currentQuantity)
+                if (quantityFromCurrentTransaction > 0)
+                  bought :+ buyTransaction.copy(quantity = Quantity(quantityFromCurrentTransaction))
+                else bought
+            }
+        }
+
+      private def excludeTransactionsTakenByCurrentSellTransaction(
+        transactions: List[Transaction],
+        buyTransactions: NonEmptyList[Transaction]
+      ) =
+        transactions.map(transaction =>
+          buyTransactions
+            .find(_.id == transaction.id)
+            .map(t => transaction.copy(quantity = transaction.quantity minus t.quantity))
+            .getOrElse(transaction)
+        )
 
     }
 
