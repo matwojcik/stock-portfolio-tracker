@@ -22,6 +22,10 @@ object domain {
   case class Money(value: BigDecimal, currency: Currency) {
     def *(quantity: Quantity): Money = Money(quantity.value * value, currency)
 
+    // todo maybe it could be done type safe?
+    def minus(other: Money): Option[Money] = Option.when(other.currency == currency)(Money(value - other.value, currency))
+    def plus(other: Money): Option[Money] = Option.when(other.currency == currency)(Money(value + other.value, currency))
+
     def to(anotherCurrency: Currency)(currencyRate: CurrencyRate): Money =
       Money(value * currencyRate.value, anotherCurrency)
   }

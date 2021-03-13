@@ -2,6 +2,7 @@ package matwojcik.stock.taxes.domain
 
 import io.estatico.newtype.macros.newtype
 import matwojcik.stock.domain.Stock.Quantity
+import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.CurrencyRate
 import matwojcik.stock.domain.Money
 import matwojcik.stock.domain.Stock
@@ -18,7 +19,11 @@ case class Transaction(
   cost: Money,
   costExchangeRate: CurrencyRate,
   date: Instant
-)
+) {
+  def totalStockCost: Money = stockPrice * quantity
+  // todo how to make it less problematic around currency?
+  def totalStockCostInAccountingCurrency(currency: Currency): Money = stockPrice.to(currency)(stockPriceExchangeRate)
+}
 
 object Transaction {
   @newtype case class Id(value: String)

@@ -12,8 +12,10 @@ object TestTransactions {
   val someStockId: Stock.Id = Stock.Id("STOCK1")
   val otherStockId: Stock.Id = Stock.Id("STOCK2")
   val EUR: Currency = Currency("EUR")
+  val PLN: Currency = Currency("PLN")
 
   val EurToPln: CurrencyRate = CurrencyRate(0.25)
+  val Y2019 = Year.of(2019)
   val Y2020 = Year.of(2020)
   val PolishZone = ZoneId.of("Europe/Warsaw")
   val September2019 = Instant.from(OffsetDateTime.of(2019, 9, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
