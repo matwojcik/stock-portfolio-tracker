@@ -22,7 +22,7 @@ case class Transaction(
 ) {
   def totalStockCost: Money = stockPrice * quantity
   // todo how to make it less problematic around currency?
-  def totalStockCostInAccountingCurrency(currency: Currency): Money = stockPrice.to(currency)(stockPriceExchangeRate)
+  def totalStockCostInAccountingCurrency(currency: Currency): Money = totalStockCost.to(currency)(stockPriceExchangeRate)
 }
 
 object Transaction {
