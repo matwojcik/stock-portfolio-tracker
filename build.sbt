@@ -138,7 +138,14 @@ lazy val importing = (project in file("importing"))
     commonSettings,
     compilerPlugins,
     compilerOptions,
-    testSettings
+    coreDependencies,
+    testSettings,
+    libraryDependencies ++= Seq(
+      "com.nrinaudo" %% "kantan.csv-java8",
+      "com.nrinaudo" %% "kantan.csv-cats",
+      "com.nrinaudo" %% "kantan.csv-generic",
+      "com.nrinaudo" %% "kantan.csv-refined"
+    ).map(_ % "0.6.1")
   )
   .dependsOn(core)
 
