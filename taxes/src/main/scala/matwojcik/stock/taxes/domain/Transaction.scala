@@ -1,11 +1,11 @@
 package matwojcik.stock.taxes.domain
 
 import io.estatico.newtype.macros.newtype
-import matwojcik.stock.domain.Stock.Quantity
 import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.CurrencyRate
 import matwojcik.stock.domain.Money
 import matwojcik.stock.domain.Stock
+import matwojcik.stock.domain.Stock.Quantity
 
 import java.time.Instant
 
@@ -16,13 +16,14 @@ case class Transaction(
   quantity: Quantity,
   stockPrice: Money,
   stockPriceExchangeRate: CurrencyRate,
-  cost: Money,
-  costExchangeRate: CurrencyRate,
+  provision: Money,
+  provisionExchangeRate: CurrencyRate,
   date: Instant
 ) {
-  def totalStockCost: Money = stockPrice * quantity
+  def totalStockCost: Money = (stockPrice * quantity).rounded
   // todo how to make it less problematic around currency?
-  def totalStockCostInAccountingCurrency(currency: Currency): Money = totalStockCost.to(currency)(stockPriceExchangeRate)
+  def totalStockCostInAccountingCurrency(currency: Currency): Money = totalStockCost.to(currency)(stockPriceExchangeRate).rounded
+  def provisionInAccountingCurrency(currency: Currency): Money = provision.to(currency)(provisionExchangeRate).rounded
 }
 
 object Transaction {

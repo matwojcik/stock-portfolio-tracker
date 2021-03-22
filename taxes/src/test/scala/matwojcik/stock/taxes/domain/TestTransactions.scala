@@ -6,7 +6,11 @@ import matwojcik.stock.domain.CurrencyRate
 import matwojcik.stock.domain.Money
 import matwojcik.stock.domain.Stock
 
-import java.time.{Instant, OffsetDateTime, Year, ZoneId, ZoneOffset}
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.Year
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 object TestTransactions {
   val someStockId: Stock.Id = Stock.Id("STOCK1")
@@ -33,16 +37,29 @@ object TestTransactions {
     quantity = Stock.Quantity(10),
     stockPrice = Money(50.0, EUR),
     stockPriceExchangeRate = EurToPln,
-    cost = Money(1, EUR),
-    costExchangeRate = EurToPln,
+    provision = Money(1, EUR),
+    provisionExchangeRate = EurToPln,
     date = March2020
   )
 
   val buyTransaction = sellTransaction.copy(id = Transaction.Id("B1"), tpe = Transaction.Type.Buy, date = December2019)
 
-  def sell(id: Transaction.Id, stockId: Stock.Id = someStockId, quantity: Quantity = Quantity(10), price: BigDecimal = 50.0, date: Instant = February2020): Transaction =
+  def sell(
+    id: Transaction.Id,
+    stockId: Stock.Id = someStockId,
+    quantity: Quantity = Quantity(10),
+    price: BigDecimal = 50.0,
+    date: Instant = February2020
+  ): Transaction =
     sellTransaction.copy(id = id, stock = stockId, quantity = quantity, stockPrice = Money(price, EUR), date = date)
 
-  def buy(id: Transaction.Id, stockId: Stock.Id = someStockId, quantity: Quantity = Quantity(10), price: BigDecimal = 50.0, date: Instant = February2020): Transaction =
+  def buy(
+    id: Transaction.Id,
+    stockId: Stock.Id = someStockId,
+    quantity: Quantity = Quantity(10),
+    price: BigDecimal = 50.0,
+    date: Instant = February2020
+  ): Transaction =
     buyTransaction.copy(id = id, stock = stockId, quantity = quantity, stockPrice = Money(price, EUR), date = date)
+
 }

@@ -3,6 +3,8 @@ package matwojcik.stock
 import io.estatico.newtype.macros.newtype
 import matwojcik.stock.domain.Stock.Quantity
 
+import scala.math.BigDecimal.RoundingMode
+
 object domain {
 
   object Stock {
@@ -21,6 +23,7 @@ object domain {
 
   case class Money(value: BigDecimal, currency: Currency) {
     def *(quantity: Quantity): Money = Money(quantity.value * value, currency)
+    def rounded: Money = Money(value.setScale(2, RoundingMode.HALF_UP), currency)
 
     // todo maybe it could be done type safe?
     def minus(other: Money): Option[Money] = Option.when(other.currency == currency)(Money(value - other.value, currency))

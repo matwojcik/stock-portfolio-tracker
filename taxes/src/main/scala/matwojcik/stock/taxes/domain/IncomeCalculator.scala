@@ -21,27 +21,29 @@ object IncomeCalculator {
   def instance[F[_]: SoldPositions: Monad]: IncomeCalculator[F] =
     new IncomeCalculator[F] {
 
-      override def calculate(year: Year, zone: ZoneId, currency: Currency, transactions: NonEmptyList[Transaction]): F[List[Income]] = {
-
-        def findProvisions(transactions: NonEmptyList[Transaction]) =
-          transactions
-            .filter(_.date.atZone(zone).getYear == year.getValue)
-            .map(transaction =>
-              Provision(transaction.date, transaction.cost.to(currency)(transaction.costExchangeRate) * Quantity(-1), transaction)
-            )
-
+      override def calculate(year: Year, zone: ZoneId, currency: Currency, transactions: NonEmptyList[Transaction]): F[List[Income]] =
         for {
           soldPositions <- SoldPositions[F].findSoldPositions(year, zone, transactions)
           soldPositionsIncome = calculateTotalCostOfSoldPositions(soldPositions, currency)
-          provisions = findProvisions(transactions)
+          provisions = findProvisions(year, zone, currency, transactions)
         } yield provisions ++ soldPositionsIncome
-      }
+
+      private def findProvisions(year: Year, zone: ZoneId, currency: Currency, transactions: NonEmptyList[Transaction]) =
+        transactions
+          .filter(_.date.atZone(zone).getYear == year.getValue)
+          .filterNot(_.provision.value == 0)
+          .map(transaction =>
+            Provision(
+              transaction.date,
+              transaction.provisionInAccountingCurrency(currency) * Quantity(-1),
+              transaction
+            )
+          )
 
       private def calculateTotalCostOfSoldPositions(soldPositions: List[Income.SoldPosition], currency: Currency) =
         soldPositions.map { soldPosition =>
           Income.StockSell(soldPosition.sellTransaction.date, soldPosition.income(currency), soldPosition)
         }
-
 
     }
 

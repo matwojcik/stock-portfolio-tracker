@@ -14,7 +14,7 @@ case class Transaction(
   stockId: Stock.Id,
   stockPrice: Money,
   quantity: Quantity,
-  cost: Money
+  provision: Money
 )
 
 object Transaction {

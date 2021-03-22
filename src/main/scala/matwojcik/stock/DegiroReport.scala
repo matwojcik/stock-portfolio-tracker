@@ -29,7 +29,6 @@ object DegiroReport {
   def instance[F[_]: TransactionsImporter: CurrencyRatesImporter: IncomeCalculator: Sync]: DegiroReport[F] =
     new DegiroReport[F] {
 
-
       override def calculateIncome(year: Year, transactionsUrl: URL, currencies: NonEmptyList[URL]): F[List[Income]] =
         for {
           transactions <- TransactionsImporter[F].readTransactions(transactionsUrl)
@@ -61,19 +60,19 @@ object DegiroReport {
           if (t.stockPrice.currency == PLN) CurrencyRate(1.0)
           else currencies.get(t.stockPrice.currency).get // todo effectful
 
-        val costExchangeRate =
-          if (t.cost.currency == PLN) CurrencyRate(1.0)
-          else currencies.get(t.cost.currency).get // todo effectful
+        val provisionExchangeRate =
+          if (t.provision.currency == PLN) CurrencyRate(1.0)
+          else currencies.get(t.provision.currency).get // todo effectful
 
         Transaction(
           id = Transaction.Id(t.id.value),
           stock = t.stockId,
-          tpe = if(t.tpe == importing.Transaction.Type.Sell) Transaction.Type.Sell else Transaction.Type.Buy,
+          tpe = if (t.tpe == importing.Transaction.Type.Sell) Transaction.Type.Sell else Transaction.Type.Buy,
           quantity = t.quantity,
           stockPrice = t.stockPrice,
           stockPriceExchangeRate = stockExchangeRate,
-          cost = t.cost,
-          costExchangeRate = costExchangeRate,
+          provision = t.provision,
+          provisionExchangeRate = provisionExchangeRate,
           date = t.date
         )
       }
