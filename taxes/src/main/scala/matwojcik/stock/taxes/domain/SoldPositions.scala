@@ -57,9 +57,14 @@ object SoldPositions {
                 val currentQuantity = bought.map(_.quantity.value).sum
                 val quantityFromCurrentTransaction =
                   Integer.min(buyTransaction.quantity.value, sellTransaction.quantity.value - currentQuantity)
-                if (quantityFromCurrentTransaction > 0)
-                  bought :+ buyTransaction.copy(quantity = Quantity(quantityFromCurrentTransaction))
-                else bought
+
+                if (quantityFromCurrentTransaction > 0) {
+                  // see https://issuu.com/sii.org.pl/docs/optymalizacja_podatkowa?ff slide 9
+                  // provision should be taken proportional when dealing with total cost during sell
+                  val proportionalProvision =
+                    (buyTransaction.provision * (quantityFromCurrentTransaction.toDouble / buyTransaction.quantity.value)).rounded
+                  bought :+ buyTransaction.copy(quantity = Quantity(quantityFromCurrentTransaction), provision = proportionalProvision)
+                } else bought
             }
         }
 
@@ -70,7 +75,14 @@ object SoldPositions {
         transactions.map(transaction =>
           buyTransactions
             .find(_.id == transaction.id)
-            .map(t => transaction.copy(quantity = transaction.quantity minus t.quantity))
+            .map(t =>
+              transaction.copy(
+                quantity = transaction.quantity minus t.quantity,
+                // see https://issuu.com/sii.org.pl/docs/optymalizacja_podatkowa?ff slide 9
+                // provision should be taken proportional when dealing with total cost during sell
+                provision = transaction.provision minusUnsafe t.provision
+              )
+            )
             .getOrElse(transaction)
         )
 

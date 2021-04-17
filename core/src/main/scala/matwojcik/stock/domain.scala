@@ -27,6 +27,7 @@ object domain {
 
   case class Money(value: BigDecimal, currency: Currency) {
     def *(quantity: Quantity): Money = Money(quantity.value * value, currency)
+    def *(multiplier: Double): Money = Money(multiplier * value, currency)
     def rounded: Money = Money(value.setScale(2, RoundingMode.HALF_UP), currency)
 
     // todo maybe it could be done type safe?

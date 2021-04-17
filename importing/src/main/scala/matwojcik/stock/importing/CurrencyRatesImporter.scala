@@ -38,7 +38,7 @@ object CurrencyRatesImporter {
           Currency("GBP") -> CurrencyRate(row.gbp),
           Currency("USD") -> CurrencyRate(row.usd),
           Currency("CHF") -> CurrencyRate(row.chf),
-          Currency("GBX") -> CurrencyRate(row.gbp * 100)
+          Currency("GBX") -> CurrencyRate(row.gbp / 100)
         )
 
     }
