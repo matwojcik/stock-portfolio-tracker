@@ -67,6 +67,7 @@ object DegiroReport {
         Transaction(
           id = Transaction.Id(t.id.value),
           stock = t.stockId,
+          exchange = t.exchange,
           tpe = if (t.tpe == importing.Transaction.Type.Sell) Transaction.Type.Sell else Transaction.Type.Buy,
           quantity = t.quantity,
           stockPrice = t.stockPrice,

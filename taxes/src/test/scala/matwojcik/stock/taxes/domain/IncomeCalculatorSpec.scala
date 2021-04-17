@@ -31,11 +31,7 @@ class IncomeCalculatorSpec extends AnyFeatureSpec with Matchers with GivenWhenTh
 
       val soldPositions = calculator.calculate(Y2019, PolishZone, PLN, transactions).unsafeRunSync()
 
-      soldPositions should contain only Income.Provision(
-        buyTransaction.date,
-        buyTransaction.provision.to(PLN)(buyTransaction.provisionExchangeRate) * Quantity(-1),
-        buyTransaction
-      )
+      soldPositions shouldBe empty
     }
 
     Scenario("Single buy single sell") {
@@ -48,15 +44,13 @@ class IncomeCalculatorSpec extends AnyFeatureSpec with Matchers with GivenWhenTh
 
       val soldPositions = calculator.calculate(Y2020, PolishZone, PLN, transactions).unsafeRunSync()
 
-      val sellIncome = sellTransaction.totalStockCostInAccountingCurrency(PLN) minus buyTransaction.totalStockCostInAccountingCurrency(PLN)
+      val sellIncome =
+        sellTransaction.totalStockCostInAccountingCurrency(PLN) minusUnsafe buyTransaction.totalStockCostInAccountingCurrency(
+          PLN
+        ) minusUnsafe buyTransaction.provisionInAccountingCurrency(PLN) minusUnsafe sellTransaction.provisionInAccountingCurrency(PLN)
 
       soldPositions should contain only (
-        Income.Provision(
-          sellTransaction.date,
-          sellTransaction.provision.to(PLN)(sellTransaction.provisionExchangeRate) * Quantity(-1),
-          sellTransaction
-        ),
-        Income.StockSell(sellTransaction.date, sellIncome.get, SoldPosition(sellTransaction, NonEmptyList.of(buyTransaction)))
+        Income(sellTransaction.date, sellIncome, SoldPosition(sellTransaction, NonEmptyList.of(buyTransaction)))
       )
     }
   }

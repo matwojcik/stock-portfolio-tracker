@@ -12,6 +12,7 @@ case class Transaction(
   date: Instant,
   tpe: Transaction.Type,
   stockId: Stock.Id,
+  exchange: Stock.Exchange,
   stockPrice: Money,
   quantity: Quantity,
   provision: Money

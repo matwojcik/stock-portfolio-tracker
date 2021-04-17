@@ -19,6 +19,7 @@ case class TransactionRow(
   date: LocalDate,
   time: LocalTime,
   stockId: String,
+  stockExchange: String,
   quantity: Int,
   stockPrice: BigDecimal,
   stockCurrency: String,
@@ -32,6 +33,7 @@ case class TransactionRow(
       date = ZonedDateTime.of(date, time, zoneId).toInstant,
       tpe = if (quantity > 0) Transaction.Type.Buy else Transaction.Type.Sell,
       stockId = Stock.Id(stockId),
+      exchange = Stock.Exchange(stockExchange),
       stockPrice = Money(stockPrice, Currency(stockCurrency)),
       quantity = Quantity(quantity.abs),
       provision =
@@ -43,5 +45,5 @@ case class TransactionRow(
 object TransactionRow {
   implicit val localDateDecoder: CellDecoder[LocalDate] =
     CellDecoder.from(s => DecodeResult(LocalDate.parse(s, DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-  implicit val decoder = RowDecoder.decoder(18, 0, 1, 3, 6, 7, 8, 14, 15)(TransactionRow.apply)
+  implicit val decoder = RowDecoder.decoder(18, 0, 1, 3, 4, 6, 7, 8, 14, 15)(TransactionRow.apply)
 }

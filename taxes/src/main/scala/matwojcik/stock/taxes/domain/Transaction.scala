@@ -12,6 +12,7 @@ import java.time.Instant
 case class Transaction(
   id: Transaction.Id,
   stock: Stock.Id,
+  exchange: Stock.Exchange,
   tpe: Transaction.Type,
   quantity: Quantity,
   stockPrice: Money,

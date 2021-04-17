@@ -33,6 +33,7 @@ object TestTransactions {
   val sellTransaction = Transaction(
     id = Transaction.Id("S1"),
     stock = someStockId,
+    exchange = Stock.Exchange("LSE"),
     tpe = Transaction.Type.Sell,
     quantity = Stock.Quantity(10),
     stockPrice = Money(50.0, EUR),
