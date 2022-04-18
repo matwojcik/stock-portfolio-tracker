@@ -32,8 +32,8 @@ class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
 
     val result = instance
       .calculateIncome(
-        Year.of(2019),
-        new File("/Users/mateusz.wojcik/projects/stock-data/2020/Transactions (2).csv").toURI.toURL,
+        Year.of(2021),
+        new File("/Users/mateusz.wojcik/projects/stock-data/2021/Transactions (3).csv").toURI.toURL,
         NonEmptyList.of(
           new File("/Users/mateusz.wojcik/projects/stock-data/2020/archiwum_tab_a_2019.csv").toURI.toURL,
           new File("/Users/mateusz.wojcik/projects/stock-data/2020/archiwum_tab_a_2020.csv").toURI.toURL,
@@ -44,34 +44,39 @@ class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
 
     result.foreach(income => println(income.show))
 
-    def printSum(income: List[Income])(f: Income => Money) = println(income.map(f).combineAll(Money.monoid.plus(Currency("PLN"))))
+    def printSum(name: String)(income: List[Income])(f: Income => Money) = 
+      println(s"$name: " + income.map(f).combineAll(Money.monoid.plus(Currency("PLN"))))
+
+    def printReport(incomes: List[Income]) = {
+      printSum("Net income")(incomes)(_.netIncome)
+      printSum("Gross income")(incomes)(_.soldPosition.grossIncome(Currency("PLN")))
+      printSum("Total cost")(incomes)(_.soldPosition.totalCost(Currency("PLN")))
+    }
 
     result.groupBy(_.soldPosition.sellTransaction.exchange).foreach {
       case (exchange, value) =>
         println(s"StockExchange: $exchange")
-        printSum(value)(_.netIncome)
-        printSum(value)(_.soldPosition.grossIncome(Currency("PLN")))
-        printSum(value)(_.soldPosition.totalCost(Currency("PLN")))
+        printReport(value)
         println("------------")
     }
 
     println(s"Total")
-    printSum(result)(_.netIncome)
-    printSum(result)(_.soldPosition.grossIncome(Currency("PLN")))
-    printSum(result)(_.soldPosition.totalCost(Currency("PLN")))
+    printReport(result)
     println("------------")
 
   }
 
   implicit val incomeShow: Show[Income] = Show.show {
     case Income(date, value, soldPosition) =>
-      show"""$date: $value
+      show"""Income at $date for ${soldPosition.sellTransaction.stock.value} at ${soldPosition.sellTransaction.exchange.value}: $value  (exchange rate: ${soldPosition.sellTransaction.stockPriceExchangeRate.value})
             |Sell: ${soldPosition.sellTransaction}
             |Buys:
             |""".stripMargin ++ soldPosition.buyTransactions.map(t => show"$t").reduceLeft(_ ++ "\n" ++ _) ++ "\n"
   }
 
   implicit val moneyShow: Show[Money] = Show.show(money => s"${money.value} ${money.currency}")
-  implicit val transactionShow: Show[Transaction] = Show.fromToString
+  implicit val transactionShow: Show[Transaction] = 
+    Show.show(transaction => show"${transaction.quantity.value} shares for ${transaction.stockPrice} with provision ${transaction.provision} at ${transaction.date} (exchange rate: ${transaction.stockPriceExchangeRate.value})")
+    // Show.fromToString
   implicit val instantShow: Show[Instant] = Show.fromToString
 }
