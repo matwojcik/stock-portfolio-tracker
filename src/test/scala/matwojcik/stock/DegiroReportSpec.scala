@@ -32,12 +32,13 @@ class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
 
     val result = instance
       .calculateIncome(
-        Year.of(2021),
-        new File("/Users/mateusz.wojcik/projects/stock-data/2021/Transactions (3).csv").toURI.toURL,
+        Year.of(2022),
+        new File("/Users/mateusz/projects/stock-data/2022/Transactions.csv").toURI.toURL,
         NonEmptyList.of(
-          new File("/Users/mateusz.wojcik/projects/stock-data/2020/archiwum_tab_a_2019.csv").toURI.toURL,
-          new File("/Users/mateusz.wojcik/projects/stock-data/2020/archiwum_tab_a_2020.csv").toURI.toURL,
-          new File("/Users/mateusz.wojcik/projects/stock-data/2020/archiwum_tab_a_2021.csv").toURI.toURL
+          new File("/Users/mateusz/projects/stock-data/2022/archiwum_tab_a_2019.csv").toURI.toURL,
+          new File("/Users/mateusz/projects/stock-data/2022/archiwum_tab_a_2020.csv").toURI.toURL,
+          new File("/Users/mateusz/projects/stock-data/2022/archiwum_tab_a_2021.csv").toURI.toURL,
+          new File("/Users/mateusz/projects/stock-data/2022/archiwum_tab_a_2022.csv").toURI.toURL
         )
       )
       .unsafeRunSync()
