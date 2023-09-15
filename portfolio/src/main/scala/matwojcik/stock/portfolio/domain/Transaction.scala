@@ -10,11 +10,7 @@ case class Transaction(id: Transaction.Id, stock: Stock.Id, tpe: Transaction.Typ
 object Transaction {
   case class Id(value: String)
 
-  sealed trait Type extends Product with Serializable
-
-  object Type {
-    case object Buy extends Type
-    case object Sell extends Type
-  }
+  enum Type:
+    case Buy, Sell
 
 }

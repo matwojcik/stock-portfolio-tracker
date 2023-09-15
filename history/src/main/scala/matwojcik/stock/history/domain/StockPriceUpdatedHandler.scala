@@ -54,11 +54,8 @@ object StockPriceUpdatedHandler {
     }
 
   object failures {
-    sealed trait StockPriceUpdateFailure extends Product with Serializable
-
-    object StockPriceUpdateFailure {
-      case class NotFound(id: Portfolio.Id) extends StockPriceUpdateFailure
-    }
+    enum StockPriceUpdateFailure:
+      case NotFound(id: Portfolio.Id)
 
   }
 
