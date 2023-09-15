@@ -23,7 +23,7 @@ object Portfolios {
   def apply[F[_]](implicit ev: Portfolios[F]): Portfolios[F] = ev
 
   def instance[F[_]: PortfolioRepository: Sync]: Portfolios[F] = new Portfolios[F] {
-    private val logger = Slf4jLogger.getLogger[F]
+    private val logger = Slf4jLogger.getLoggerFromClass[F](getClass())
 
     type EventWriter[A] = Writer[Chain[PortfolioDomainEvent], A]
 
