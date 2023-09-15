@@ -3,11 +3,10 @@ package matwojcik.stock.portfolio.domain
 import java.util.UUID
 
 import cats.data.Chain
+import cats.Functor
 import cats.effect.Sync
 import cats.implicits._
-import com.olegpy.meow.prelude._
-import cats.mtl.FunctorTell
-import io.estatico.newtype.macros.newtype
+import cats.mtl.Tell
 import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.Stock
 import matwojcik.stock.domain.Stock.Quantity
@@ -20,6 +19,7 @@ import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent
 import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.CurrencyChanged
 import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.PortfolioCreated
 import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.TransactionAdded
+
 
 case class Portfolio private (id: Portfolio.Id, currency: Currency, private val holdings: Map[Stock.Id, Holding]) {
 
@@ -61,7 +61,7 @@ object Portfolio {
   def empty(id: Portfolio.Id, currency: Currency): Portfolio = Portfolio(id, currency, Map.empty)
 
   def fromEvents(creation: PortfolioCreated, events: List[PortfolioDomainEvent]): Either[PortfolioRecreationFailure, Portfolio] =
-    events.foldM[Either[PortfolioRecreationFailure, *], Portfolio](Portfolio.empty(creation.portfolioId, creation.currency)) {
+    events.foldM[({type Λ$[β$0$] = Either[PortfolioRecreationFailure, β$0$]})#Λ$, Portfolio](Portfolio.empty(creation.portfolioId, creation.currency)) {
       case (portfolio, event) =>
         event match {
           case e: PortfolioCreated =>
@@ -81,15 +81,15 @@ object Portfolio {
 
   object commands {
 
-    type EventLog[F[_]] = FunctorTell[F, Chain[PortfolioDomainEvent]]
+    type EventLog[F[_]] = Tell[F, Chain[PortfolioDomainEvent]]
 
-    def create[F[_]](id: Portfolio.Id, currency: Currency)(implicit Events: EventLog[F]): F[Portfolio] =
+    def create[F[_]: Functor](id: Portfolio.Id, currency: Currency)(implicit Events: EventLog[F]): F[Portfolio] =
       Events.tell(Chain.one(PortfolioCreated(id, currency))).as(Portfolio.empty(id, currency))
 
-    def changeCurrency[F[_]](portfolio: Portfolio)(newCurrency: Currency)(implicit Events: EventLog[F]): F[Portfolio] =
+    def changeCurrency[F[_]: Functor](portfolio: Portfolio)(newCurrency: Currency)(implicit Events: EventLog[F]): F[Portfolio] =
       Events.tell(Chain.one(CurrencyChanged(portfolio.id, newCurrency))).as(portfolio.changeCurrency(newCurrency))
 
-    def addTransaction[F[_]](
+    def addTransaction[F[_]: Functor](
       portfolio: Portfolio
     )(
       transaction: Transaction
@@ -108,7 +108,7 @@ object Portfolio {
     case class DomainFailure(reason: NotEnoughBalance) extends PortfolioRecreationFailure
   }
 
-  @newtype case class Id(value: String)
+  case class Id(value: String)
 
   object Id {
     def create[F[_]: Sync]: F[Id] = Sync[F].delay(Id(UUID.randomUUID().toString))

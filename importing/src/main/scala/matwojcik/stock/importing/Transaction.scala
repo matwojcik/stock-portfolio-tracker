@@ -1,6 +1,5 @@
 package matwojcik.stock.importing
 
-import io.estatico.newtype.macros.newtype
 import matwojcik.stock.domain.Money
 import matwojcik.stock.domain.Stock
 import matwojcik.stock.domain.Stock.Quantity
@@ -19,7 +18,7 @@ case class Transaction(
 )
 
 object Transaction {
-  @newtype case class Id(value: String)
+  case class Id(value: String)
 
   sealed trait Type extends Product with Serializable
 

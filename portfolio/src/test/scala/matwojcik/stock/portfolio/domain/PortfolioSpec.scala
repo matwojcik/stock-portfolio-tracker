@@ -4,7 +4,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 import cats.effect.IO
-import cats.scalatest.EitherValues
+import org.scalatest.EitherValues
 import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.Stock
 import matwojcik.stock.domain.Stock.Quantity
@@ -12,6 +12,7 @@ import matwojcik.stock.portfolio.domain.Portfolio.failures.NotEnoughBalance
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.GivenWhenThen
+import cats.effect.unsafe.implicits.global
 
 class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with EitherValues {
 
@@ -73,7 +74,7 @@ class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with
       val result = portfolio.addTransaction(transaction)
 
       Then("Portfolio should not be changed returning failure instead")
-      result.leftValue shouldBe (NotEnoughBalance(transaction.stock))
+      result.left.value shouldBe (NotEnoughBalance(transaction.stock))
     }
 
     Scenario("Not enough stock") {
@@ -86,7 +87,7 @@ class PortfolioSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with
       val result = portfolio.value.addTransaction(transaction2)
 
       Then("Portfolio should not be changed returning failure instead")
-      result.leftValue shouldBe (NotEnoughBalance(transaction2.stock))
+      result.left.value shouldBe (NotEnoughBalance(transaction2.stock))
     }
 
     Scenario("Just enough stock") {

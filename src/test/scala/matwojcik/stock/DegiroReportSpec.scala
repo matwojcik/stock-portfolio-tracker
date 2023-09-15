@@ -4,6 +4,7 @@ import cats.Show
 import cats.implicits._
 import cats.data.NonEmptyList
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import cats.implicits.showInterpolator
 import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.Money
@@ -22,11 +23,11 @@ import java.time.Instant
 import java.time.Year
 
 class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
-  implicit val sp = SoldPositions.instance[IO]
-  implicit val calculator = IncomeCalculator.instance[IO]
-  implicit val importer = CurrencyRatesImporter.nbpInstance[IO]
-  implicit val transactionImporter = TransactionsImporter.instance[IO]
-  val instance = DegiroReport.instance[IO]
+  implicit val sp: SoldPositions[IO] = SoldPositions.instance[IO]
+  implicit val calculator: IncomeCalculator[IO] = IncomeCalculator.instance[IO]
+  implicit val importer: CurrencyRatesImporter[IO] = CurrencyRatesImporter.nbpInstance[IO]
+  implicit val transactionImporter: TransactionsImporter[IO] = TransactionsImporter.instance[IO]
+  val instance: DegiroReport[IO] = DegiroReport.instance[IO]
 
   Scenario("Import") {
 

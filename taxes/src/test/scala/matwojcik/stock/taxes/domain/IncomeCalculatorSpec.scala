@@ -2,6 +2,7 @@ package matwojcik.stock.taxes.domain
 
 import cats.data.NonEmptyList
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import matwojcik.stock.domain.Stock.Quantity
 import matwojcik.stock.taxes.domain.Income.SoldPosition
 import matwojcik.stock.taxes.domain.TestTransactions._
@@ -10,8 +11,8 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 
 class IncomeCalculatorSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
-  implicit val sp = SoldPositions.instance[IO]
-  implicit val calculator = IncomeCalculator.instance[IO]
+  implicit val sp: SoldPositions[IO] = SoldPositions.instance[IO]
+  implicit val calculator: IncomeCalculator[IO] = IncomeCalculator.instance[IO]
 
   Feature("Calculating income") {
     Scenario("No transactions in year") {

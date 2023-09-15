@@ -4,7 +4,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 import cats.effect.IO
-import cats.scalatest.EitherValues
+import cats.effect.unsafe.implicits.global
 import matwojcik.stock.domain.Currency
 import matwojcik.stock.portfolio.domain.Portfolio
 import matwojcik.stock.portfolio.domain.PortfolioRepository
@@ -12,6 +12,7 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.compatible.Assertion
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.EitherValues
 
 class PortfoliosSpec extends AnyFeatureSpec with Matchers with GivenWhenThen with EitherValues {
   val portfolioId: Portfolio.Id = Portfolio.Id("1")
