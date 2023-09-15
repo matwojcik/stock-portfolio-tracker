@@ -4,7 +4,8 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 import cats.effect.IO
-import cats.scalatest.EitherValues
+import cats.effect.unsafe.implicits.global
+import org.scalatest.EitherValues
 import matwojcik.stock.domain.Stock.Quantity
 import matwojcik.stock.domain.Currency
 import matwojcik.stock.domain.Stock
@@ -48,7 +49,7 @@ class PortfolioRecreationSpec extends AnyFeatureSpec with Matchers with GivenWhe
       val result = Portfolio.fromEvents(portfolioCreated, events)
 
       Then("Failure should be returned")
-      result.leftValue shouldBe (DuplicateCreationEvent(portfolioCreated))
+      result.left.value shouldBe (DuplicateCreationEvent(portfolioCreated))
     }
 
     Scenario("Transaction event belonging to portfolio") {
@@ -79,7 +80,7 @@ class PortfolioRecreationSpec extends AnyFeatureSpec with Matchers with GivenWhe
       val result = Portfolio.fromEvents(portfolioCreated, events)
 
       Then("Failure should be returned")
-      result.leftValue shouldBe EventNotFromPortfolio(event)
+      result.left.value shouldBe EventNotFromPortfolio(event)
     }
 
     Scenario("Currency change belonging to portfolio") {

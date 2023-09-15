@@ -6,8 +6,7 @@ import cats.data.Writer
 import cats.data.WriterT
 import cats.effect.Sync
 import cats.implicits._
-import cats.mtl.instances.all._
-import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 import matwojcik.stock.domain.Currency
 import matwojcik.stock.portfolio.domain.Portfolio
 import matwojcik.stock.portfolio.domain.PortfolioRepository

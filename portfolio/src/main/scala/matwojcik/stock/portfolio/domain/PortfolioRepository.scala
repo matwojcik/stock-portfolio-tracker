@@ -2,13 +2,15 @@ package matwojcik.stock.portfolio.domain
 
 import cats.data.Chain
 import cats.effect.Sync
-import cats.effect.concurrent.Ref
-import cats.mtl.MonadState
-import com.olegpy.meow.hierarchy._
-import com.olegpy.meow.effects._
+import cats.effect.kernel.Ref
+import cats.mtl.Stateful
 import cats.implicits._
 import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent
 import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.PortfolioCreated
+import cats.Functor
+import cats.mtl.Tell
+import cats.kernel.Semigroup
+import cats.Monad
 
 trait PortfolioRepository[F[_]] {
   def find(id: Portfolio.Id): F[Option[Portfolio]]
@@ -19,7 +21,7 @@ object PortfolioRepository {
   def apply[F[_]](implicit ev: PortfolioRepository[F]): PortfolioRepository[F] = ev
 
   type DomainEvents = Chain[PortfolioDomainEvent]
-  type EventLog[F[_]] = MonadState[F, DomainEvents]
+  type EventLog[F[_]] = Stateful[F, DomainEvents]
 
   def memory[F[_]: Sync](implicit Events: EventLog[F]): PortfolioRepository[F] =
     new PortfolioRepository[F] {
@@ -45,9 +47,19 @@ object PortfolioRepository {
         Events.modify(_ :+ event)
     }
 
+  class RefStateful[F[_]: Monad, S](ref: Ref[F, S]) extends Stateful[F, S] {
+    val monad: Monad[F] = implicitly
+    def get: F[S] = ref.get
+    def set(s: S): F[Unit] = ref.set(s)
+    override def inspect[A](f: S => A): F[A] = ref.get.map(f)
+    override def modify(f: S => S): F[Unit] = ref.update(f)
+  }
+
   def ref[F[_]: Sync](initial: DomainEvents = Chain.empty): F[PortfolioRepository[F]] =
     for {
       ref  <- Ref.of[F, DomainEvents](initial)
-      repo <- ref.runState(implicit ft => Sync[F].delay(memory[F]))
+      repo <- { implicit val r = new RefStateful(ref)
+        Sync[F].delay(memory[F])
+      }
     } yield repo
 }

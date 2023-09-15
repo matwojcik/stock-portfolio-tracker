@@ -4,6 +4,7 @@ target
 project/plugins/project/
 .idea
 .bloop
-.metal
-
-
+.metals
+.bsp
+.vscode
+metals.sbt

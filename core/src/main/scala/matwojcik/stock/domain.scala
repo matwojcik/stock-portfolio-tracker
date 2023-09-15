@@ -2,7 +2,6 @@ package matwojcik.stock
 
 import cats.kernel.Monoid
 import cats.kernel.Semigroup
-import io.estatico.newtype.macros.newtype
 import matwojcik.stock.domain.Stock.Quantity
 
 import scala.math.BigDecimal.RoundingMode
@@ -10,20 +9,20 @@ import scala.math.BigDecimal.RoundingMode
 object domain {
 
   object Stock {
-    @newtype case class Id(value: String)
+    case class Id(value: String)
 
-    @newtype case class Quantity(value: Int) {
+    case class Quantity(value: Int) {
       def plus(other: Quantity): Quantity = Quantity(value + other.value)
       def minus(other: Quantity): Quantity = Quantity(value - other.value)
       def >=(other: Quantity): Boolean = value >= other.value
     }
 
-    @newtype case class Exchange(value: String)
+    case class Exchange(value: String)
 
   }
 
-  @newtype case class Currency(id: String)
-  @newtype case class CurrencyRate(value: BigDecimal)
+  case class Currency(id: String)
+  case class CurrencyRate(value: BigDecimal)
 
   case class Money(value: BigDecimal, currency: Currency) {
     def *(quantity: Quantity): Money = Money(quantity.value * value, currency)

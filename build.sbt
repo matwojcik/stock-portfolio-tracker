@@ -1,68 +1,60 @@
 lazy val commonSettings = Seq(
-  scalaVersion := "2.13.3"
+  scalaVersion := "2.13.11"
+  // scalaVersion := "3.3.0"
 )
 
 val compilerPlugins = Seq(
-  addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full),
-  addCompilerPlugin("com.kubukoz" % "better-tostring" % "0.2.6" cross CrossVersion.full),
-  addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
+  // addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full)
 )
 
 val compilerOptions = Seq(
   scalacOptions -= "-Xfatal-warnings",
-  scalacOptions ++= Seq("-Ymacro-annotations")
+  // scalacOptions += "-Ykind-projector",
+  scalacOptions += "-Ytasty-reader",
+  // scalacOptions ++= Seq("-Ymacro-annotations")
 )
 
 lazy val coreDependencies = {
   val cats = Seq(
-    "org.typelevel" %% "cats-core" % "2.3.1",
-    "org.typelevel" %% "cats-effect" % "2.3.0",
-    "org.typelevel" %% "cats-mtl-core" % "0.7.1",
-    "com.github.mpilquist" %% "simulacrum" % "0.19.0",
-    "org.typelevel" %% "cats-tagless-macros" % "0.12",
-    "com.olegpy" %% "meow-mtl-core" % "0.4.1",
-    "com.olegpy" %% "meow-mtl-effects" % "0.4.1",
-    "co.fs2" %% "fs2-core" % "2.3.0"
-  )
+    "org.typelevel" %% "cats-core" % "2.6.1",
+    "org.typelevel" %% "cats-effect" % "3.5.1",
+    "org.typelevel" %% "cats-mtl" % "1.3.1",
+    "co.fs2" %% "fs2-core" % "3.9.2"
+  )//.map(_ cross CrossVersion.for2_13Use3)
   val logging = Seq(
     "ch.qos.logback" % "logback-classic" % "1.2.3",
-    "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-    "io.chrisdavenport" %% "log4cats-slf4j" % "1.1.1"
+    "org.typelevel" %% "log4cats-slf4j" % "2.6.0" //cross CrossVersion.for2_13Use3
   )
 
-  val others = Seq(
-    "io.estatico" %% "newtype" % "0.4.4"
-  )
+  // val others = Seq(
+  //   "io.estatico" %% "newtype" % "0.4.4"
+  // ).map(_ cross CrossVersion.for2_13Use3)
 
   Seq(
-    libraryDependencies ++= cats ++ logging ++ others
+    libraryDependencies ++= cats ++ logging
   )
 }
 
 lazy val rootDependencies = {
-  val CirceVersion = "0.13.0"
-  val config = Seq(
-    "com.github.pureconfig" %% "pureconfig" % "0.14.0",
-    "eu.timepit" %% "refined-pureconfig" % "0.9.20"
-  )
+  val CirceVersion = "0.14.6"
 
   val circe = Seq(
     "io.circe" %% "circe-generic" % CirceVersion exclude ("aopalliance", "aopalliance"),
     "io.circe" %% "circe-parser" % CirceVersion
-  )
+  )//.map(_ cross CrossVersion.for2_13Use3)
 
   Seq(
-    libraryDependencies ++= config ++ circe
+    libraryDependencies ++= circe
   )
 }
 
 lazy val testSettings = {
   val dependencies = {
     libraryDependencies ++= Seq(
-      "org.scalactic" %% "scalactic" % "3.2.3",
-      "org.scalatest" %% "scalatest" % "3.2.3",
-      "com.ironcorelabs" %% "cats-scalatest" % "3.1.1"
-    ).map(_ % Test)
+      "org.scalactic" %% "scalactic" % "3.2.17",
+      "org.scalatest" %% "scalatest" % "3.2.17"
+    ).map(_ % Test //cross CrossVersion.for2_13Use3
+    )  
   }
 
   Seq(
@@ -142,10 +134,10 @@ lazy val importing = (project in file("importing"))
     testSettings,
     libraryDependencies ++= Seq(
       "com.nrinaudo" %% "kantan.csv-java8",
-      "com.nrinaudo" %% "kantan.csv-cats",
+      // "com.nrinaudo" %% "kantan.csv-cats",
       "com.nrinaudo" %% "kantan.csv-generic",
-      "com.nrinaudo" %% "kantan.csv-refined"
-    ).map(_ % "0.6.1")
+      // "com.nrinaudo" %% "kantan.csv-refined"
+    ).map(_ % "0.6.1").map(_ cross CrossVersion.for3Use2_13)
   )
   .dependsOn(core)
 

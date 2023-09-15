@@ -2,7 +2,6 @@ package matwojcik.stock.history.domain
 
 import java.time.LocalDate
 
-import io.estatico.newtype.macros.newtype
 import matwojcik.stock.domain.Stock.Quantity
 import matwojcik.stock.domain.Money
 import matwojcik.stock.domain.Stock
@@ -18,5 +17,5 @@ case class HoldingHistory(
 )
 
 object Portfolio {
-  @newtype case class Id(value: String)
+  case class Id(value: String)
 }

@@ -2,7 +2,6 @@ package matwojcik.stock.prices.domain
 
 import cats.data.NonEmptySet
 import fs2.Stream
-import io.estatico.newtype.macros.newtype
 import matwojcik.stock.domain.Stock
 
 trait PortfolioStockRepository[F[_]] {
@@ -16,5 +15,5 @@ object PortfolioStockRepository {
 case class StockPortfolios(stock: Stock.Id, portfolios: NonEmptySet[Portfolio.Id])
 
 object Portfolio {
-  @newtype case class Id(value: String)
+  case class Id(value: String)
 }

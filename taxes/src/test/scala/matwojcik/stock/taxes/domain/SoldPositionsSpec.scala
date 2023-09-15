@@ -8,6 +8,7 @@ import cats.Id
 import cats.implicits._
 import cats.data.NonEmptyList
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import matwojcik.stock.domain.Money
 import matwojcik.stock.domain.Stock.Quantity
 import org.scalatest.GivenWhenThen
