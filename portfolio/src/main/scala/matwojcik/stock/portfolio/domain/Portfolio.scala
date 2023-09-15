@@ -20,28 +20,31 @@ import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.CurrencyChan
 import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.PortfolioCreated
 import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.TransactionAdded
 
-
 case class Portfolio private (id: Portfolio.Id, currency: Currency, private val holdings: Map[Stock.Id, Holding]) {
 
   def addTransaction(transaction: Transaction): Either[NotEnoughBalance, Portfolio] = {
     val stock = transaction.stock
     val quantity = transaction.quantity
     val newHolding = transaction.tpe match {
-      case Type.Buy =>
+      case Type.Buy  =>
         addStock(stock, quantity).asRight[NotEnoughBalance]
       case Type.Sell =>
         holdings.get(stock) match {
           case Some(holding) =>
             Either.cond(holding.balance >= quantity, holding.copy(balance = holding.balance minus quantity), NotEnoughBalance(stock))
-          case None =>
+          case None          =>
             NotEnoughBalance(stock).asLeft[Holding]
         }
     }
 
     newHolding.map(holding =>
-      Portfolio(id = id, currency = currency, holdings = (holdings + (stock -> holding)).filter {
-        case (_, holding) => holding.balance.value > 0
-      })
+      Portfolio(
+        id = id,
+        currency = currency,
+        holdings = (holdings + (stock -> holding)).filter { case (_, holding) =>
+          holding.balance.value > 0
+        }
+      )
     )
   }
 
@@ -61,22 +64,23 @@ object Portfolio {
   def empty(id: Portfolio.Id, currency: Currency): Portfolio = Portfolio(id, currency, Map.empty)
 
   def fromEvents(creation: PortfolioCreated, events: List[PortfolioDomainEvent]): Either[PortfolioRecreationFailure, Portfolio] =
-    events.foldM[({type Λ$[β$0$] = Either[PortfolioRecreationFailure, β$0$]})#Λ$, Portfolio](Portfolio.empty(creation.portfolioId, creation.currency)) {
-      case (portfolio, event) =>
-        event match {
-          case e: PortfolioCreated =>
-            DuplicateCreationEvent(e).asLeft[Portfolio]
-          case e @ PortfolioDomainEvent.TransactionAdded(id, transaction) =>
-            if (id == portfolio.id)
-              portfolio.addTransaction(transaction).leftMap(DomainFailure)
-            else
-              EventNotFromPortfolio(e).asLeft[Portfolio]
-          case e @ CurrencyChanged(portfolioId, currency) =>
-            if (portfolioId == portfolio.id)
-              portfolio.changeCurrency(currency).asRight[PortfolioRecreationFailure]
-            else
-              EventNotFromPortfolio(e).asLeft[Portfolio]
-        }
+    events.foldM[({ type Λ$[β$0$] = Either[PortfolioRecreationFailure, β$0$] })#Λ$, Portfolio](
+      Portfolio.empty(creation.portfolioId, creation.currency)
+    ) { case (portfolio, event) =>
+      event match {
+        case e: PortfolioCreated                                        =>
+          DuplicateCreationEvent(e).asLeft[Portfolio]
+        case e @ PortfolioDomainEvent.TransactionAdded(id, transaction) =>
+          if (id == portfolio.id)
+            portfolio.addTransaction(transaction).leftMap(DomainFailure)
+          else
+            EventNotFromPortfolio(e).asLeft[Portfolio]
+        case e @ CurrencyChanged(portfolioId, currency)                 =>
+          if (portfolioId == portfolio.id)
+            portfolio.changeCurrency(currency).asRight[PortfolioRecreationFailure]
+          else
+            EventNotFromPortfolio(e).asLeft[Portfolio]
+      }
     }
 
   object commands {
@@ -117,6 +121,7 @@ object Portfolio {
   object failures {
     case class NotEnoughBalance(stock: Stock.Id)
   }
+
 }
 
 case class Holding(stock: Stock.Id, balance: Quantity)

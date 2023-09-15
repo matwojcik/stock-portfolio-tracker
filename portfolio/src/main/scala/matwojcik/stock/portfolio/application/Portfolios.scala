@@ -31,10 +31,11 @@ object Portfolios {
       for {
         id <- Portfolio.Id.create[F]
         (events, portfolio) = Portfolio.commands.create[EventWriter](id, currency).run
-        _ <- logger.info(s"Created portfolio: $portfolio")
-        _ <- events.traverse_(PortfolioRepository[F].store(_))
+        _  <- logger.info(s"Created portfolio: $portfolio")
+        _  <- events.traverse_(PortfolioRepository[F].store(_))
       } yield id
 
     def addTransaction(portfolioId: Portfolio.Id, transaction: Transaction): F[Either[NotEnoughBalance, Unit]] = ???
   }
+
 }

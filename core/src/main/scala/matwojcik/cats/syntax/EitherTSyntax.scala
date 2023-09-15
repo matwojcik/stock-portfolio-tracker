@@ -16,6 +16,7 @@ trait EitherTSyntax {
   implicit final class FOptionToEitherT[F[_], A](private val foa: F[Option[A]]) {
     def toEitherT[E](ifNone: => E)(implicit F: Functor[F]): EitherT[F, E, A] = EitherT.fromOptionF(foa, ifNone)
   }
+
 }
 
 object eithert extends EitherTSyntax

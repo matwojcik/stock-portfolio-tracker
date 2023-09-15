@@ -22,12 +22,11 @@ class PortfoliosSpec extends AnyFeatureSpec with Matchers with GivenWhenThen wit
 
   Feature("Creating portfolio") {
     Scenario("Successful creation") {
-      withEmptyState {
-        case (repository, portfolios) =>
-          for {
-            id        <- portfolios.create(PLN)
-            portfolio <- repository.find(id)
-          } yield portfolio should contain(Portfolio.empty(id, PLN))
+      withEmptyState { case (repository, portfolios) =>
+        for {
+          id        <- portfolios.create(PLN)
+          portfolio <- repository.find(id)
+        } yield portfolio should contain(Portfolio.empty(id, PLN))
 
       }
     }

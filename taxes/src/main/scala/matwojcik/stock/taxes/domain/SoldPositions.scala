@@ -23,22 +23,21 @@ object SoldPositions {
         // todo find a way to make sure that all transactions have unique id
         val sortedTransactions = transactions.sortBy(_.date.toEpochMilli)
 
-        val result = sortedTransactions.foldLeft(Acc.empty) {
-          case (Acc(soldPositions, transactions), transaction) =>
-            if (transaction.tpe != Transaction.Type.Sell)
-              Acc(soldPositions, transactions :+ transaction)
-            else {
-              val buyTransactions = findBuyTransactions(transaction, transactions)
-              val transactionsWithoutAlreadyBought = excludeTransactionsTakenByCurrentSellTransaction(transactions, buyTransactions)
+        val result = sortedTransactions.foldLeft(Acc.empty) { case (Acc(soldPositions, transactions), transaction) =>
+          if (transaction.tpe != Transaction.Type.Sell)
+            Acc(soldPositions, transactions :+ transaction)
+          else {
+            val buyTransactions = findBuyTransactions(transaction, transactions)
+            val transactionsWithoutAlreadyBought = excludeTransactionsTakenByCurrentSellTransaction(transactions, buyTransactions)
 
-              if (isTransactionFromThatYear(transaction, year, zone)) {
-                // todo check if sum of bought = sold
-                val soldPosition = SoldPosition(transaction, buyTransactions)
+            if (isTransactionFromThatYear(transaction, year, zone)) {
+              // todo check if sum of bought = sold
+              val soldPosition = SoldPosition(transaction, buyTransactions)
 
-                Acc(soldPositions :+ soldPosition, transactionsWithoutAlreadyBought)
-              } else
-                Acc(soldPositions, transactionsWithoutAlreadyBought)
-            }
+              Acc(soldPositions :+ soldPosition, transactionsWithoutAlreadyBought)
+            } else
+              Acc(soldPositions, transactionsWithoutAlreadyBought)
+          }
         }
 
         result.soldPositions.pure[F]
@@ -52,19 +51,18 @@ object SoldPositions {
           allPreviousTransactions
             .filter(_.stock == sellTransaction.stock)
             .filter(_.tpe == Transaction.Type.Buy)
-            .foldLeft(List.empty[Transaction]) {
-              case (bought, buyTransaction) =>
-                val currentQuantity = bought.map(_.quantity.value).sum
-                val quantityFromCurrentTransaction =
-                  Integer.min(buyTransaction.quantity.value, sellTransaction.quantity.value - currentQuantity)
+            .foldLeft(List.empty[Transaction]) { case (bought, buyTransaction) =>
+              val currentQuantity = bought.map(_.quantity.value).sum
+              val quantityFromCurrentTransaction =
+                Integer.min(buyTransaction.quantity.value, sellTransaction.quantity.value - currentQuantity)
 
-                if (quantityFromCurrentTransaction > 0) {
-                  // see https://issuu.com/sii.org.pl/docs/optymalizacja_podatkowa?ff slide 9
-                  // provision should be taken proportional when dealing with total cost during sell
-                  val proportionalProvision =
-                    (buyTransaction.provision * (quantityFromCurrentTransaction.toDouble / buyTransaction.quantity.value)).rounded
-                  bought :+ buyTransaction.copy(quantity = Quantity(quantityFromCurrentTransaction), provision = proportionalProvision)
-                } else bought
+              if (quantityFromCurrentTransaction > 0) {
+                // see https://issuu.com/sii.org.pl/docs/optymalizacja_podatkowa?ff slide 9
+                // provision should be taken proportional when dealing with total cost during sell
+                val proportionalProvision =
+                  (buyTransaction.provision * (quantityFromCurrentTransaction.toDouble / buyTransaction.quantity.value)).rounded
+                bought :+ buyTransaction.copy(quantity = Quantity(quantityFromCurrentTransaction), provision = proportionalProvision)
+              } else bought
             }
         }
 
