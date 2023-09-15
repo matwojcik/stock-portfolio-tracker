@@ -63,7 +63,7 @@ object Portfolio {
   def empty(id: Portfolio.Id, currency: Currency): Portfolio = Portfolio(id, currency, Map.empty)
 
   def fromEvents(creation: PortfolioCreated, events: List[PortfolioDomainEvent]): Either[PortfolioRecreationFailure, Portfolio] =
-    events.foldM[({ type Λ$[β$0$] = Either[PortfolioRecreationFailure, β$0$] })#Λ$, Portfolio](
+    events.foldM[Either[PortfolioRecreationFailure, *], Portfolio](
       Portfolio.empty(creation.portfolioId, creation.currency)
     ) { case (portfolio, event) =>
       event match {
