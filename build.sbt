@@ -9,14 +9,15 @@ val compilerPlugins = Seq(
 
 val compilerOptions = Seq(
   scalacOptions -= "-Xfatal-warnings",
+  // scalacOptions -= "-Yrangepos",
   // scalacOptions += "-Ykind-projector",
-  scalacOptions += "-Ytasty-reader",
+  // scalacOptions += "-Ytasty-reader",
   // scalacOptions ++= Seq("-Ymacro-annotations")
 )
 
 lazy val coreDependencies = {
   val cats = Seq(
-    "org.typelevel" %% "cats-core" % "2.6.1",
+    "org.typelevel" %% "cats-core" % "2.10.0",
     "org.typelevel" %% "cats-effect" % "3.5.1",
     "org.typelevel" %% "cats-mtl" % "1.3.1",
     "co.fs2" %% "fs2-core" % "3.9.2"

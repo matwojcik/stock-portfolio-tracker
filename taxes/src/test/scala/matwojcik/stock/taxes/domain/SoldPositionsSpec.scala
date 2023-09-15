@@ -15,7 +15,7 @@ import org.scalatest.GivenWhenThen
 
 class SoldPositionsSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
 
-  val instance = SoldPositions.instance[IO]
+  val instance: SoldPositions[IO] = SoldPositions.instance[IO]
 
   Feature("finding sold positions") {
 

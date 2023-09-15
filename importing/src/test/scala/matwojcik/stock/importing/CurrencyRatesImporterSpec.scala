@@ -10,7 +10,7 @@ import java.io.File
 
 class CurrencyRatesImporterSpec  extends AnyFeatureSpec with Matchers with GivenWhenThen{
 
-  val importer = CurrencyRatesImporter.nbpInstance[IO]
+  val importer: CurrencyRatesImporter[IO] = CurrencyRatesImporter.nbpInstance[IO]
 
   Scenario("easy ready") {
     importer.importCurrencyRates(new File("/Users/mateusz.wojcik/Downloads/archiwum_tab_a_2020.csv").toURI.toURL).unsafeRunSync().foreach(println)

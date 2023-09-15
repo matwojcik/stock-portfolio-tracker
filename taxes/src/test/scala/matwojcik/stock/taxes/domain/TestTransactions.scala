@@ -19,18 +19,18 @@ object TestTransactions {
   val PLN: Currency = Currency("PLN")
 
   val EurToPln: CurrencyRate = CurrencyRate(0.25)
-  val Y2019 = Year.of(2019)
-  val Y2020 = Year.of(2020)
-  val PolishZone = ZoneId.of("Europe/Warsaw")
-  val September2019 = Instant.from(OffsetDateTime.of(2019, 9, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
-  val October2019 = Instant.from(OffsetDateTime.of(2019, 10, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
-  val November2019 = Instant.from(OffsetDateTime.of(2019, 11, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
-  val December2019 = Instant.from(OffsetDateTime.of(2019, 12, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
-  val January2020 = Instant.from(OffsetDateTime.of(2020, 1, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
-  val February2020 = Instant.from(OffsetDateTime.of(2020, 2, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
-  val March2020 = Instant.from(OffsetDateTime.of(2020, 3, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
+  val Y2019: Year = Year.of(2019)
+  val Y2020: Year = Year.of(2020)
+  val PolishZone: ZoneId = ZoneId.of("Europe/Warsaw")
+  val September2019: Instant = Instant.from(OffsetDateTime.of(2019, 9, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
+  val October2019: Instant = Instant.from(OffsetDateTime.of(2019, 10, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
+  val November2019: Instant = Instant.from(OffsetDateTime.of(2019, 11, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
+  val December2019: Instant = Instant.from(OffsetDateTime.of(2019, 12, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
+  val January2020: Instant = Instant.from(OffsetDateTime.of(2020, 1, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
+  val February2020: Instant = Instant.from(OffsetDateTime.of(2020, 2, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
+  val March2020: Instant = Instant.from(OffsetDateTime.of(2020, 3, 1, 10, 0, 0, 0, ZoneOffset.ofHours(1)))
 
-  val sellTransaction = Transaction(
+  val sellTransaction: Transaction = Transaction(
     id = Transaction.Id("S1"),
     stock = someStockId,
     exchange = Stock.Exchange("LSE"),
@@ -43,7 +43,7 @@ object TestTransactions {
     date = March2020
   )
 
-  val buyTransaction = sellTransaction.copy(id = Transaction.Id("B1"), tpe = Transaction.Type.Buy, date = December2019)
+  val buyTransaction: Transaction = sellTransaction.copy(id = Transaction.Id("B1"), tpe = Transaction.Type.Buy, date = December2019)
 
   def sell(
     id: Transaction.Id,
