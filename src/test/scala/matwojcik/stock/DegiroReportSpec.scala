@@ -23,10 +23,10 @@ import java.time.Instant
 import java.time.Year
 
 class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
-  implicit val sp: SoldPositions[IO] = SoldPositions.instance[IO]
-  implicit val calculator: IncomeCalculator[IO] = IncomeCalculator.instance[IO]
-  implicit val importer: CurrencyRatesImporter[IO] = CurrencyRatesImporter.nbpInstance[IO]
-  implicit val transactionImporter: TransactionsImporter[IO] = TransactionsImporter.instance[IO]
+  given sp: SoldPositions[IO] = SoldPositions.instance[IO]
+  given calculator: IncomeCalculator[IO] = IncomeCalculator.instance[IO]
+  given importer: CurrencyRatesImporter[IO] = CurrencyRatesImporter.nbpInstance[IO]
+  given transactionImporter: TransactionsImporter[IO] = TransactionsImporter.instance[IO]
   val instance: DegiroReport[IO] = DegiroReport.instance[IO]
 
   Scenario("Import") {
@@ -67,7 +67,7 @@ class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
 
   }
 
-  implicit val incomeShow: Show[Income] = Show.show { case Income(date, value, soldPosition) =>
+  given incomeShow: Show[Income] = Show.show { case Income(date, value, soldPosition) =>
     show"""Income at $date for ${soldPosition.sellTransaction.stock.value} at ${soldPosition
            .sellTransaction
            .exchange
@@ -77,13 +77,13 @@ class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
             |""".stripMargin ++ soldPosition.buyTransactions.map(t => show"$t").reduceLeft(_ ++ "\n" ++ _) ++ "\n"
   }
 
-  implicit val moneyShow: Show[Money] = Show.show(money => s"${money.value} ${money.currency}")
+  given moneyShow: Show[Money] = Show.show(money => s"${money.value} ${money.currency}")
 
-  implicit val transactionShow: Show[Transaction] =
+  given transactionShow: Show[Transaction] =
     Show.show(transaction =>
       show"${transaction.quantity.value} shares for ${transaction.stockPrice} with provision ${transaction.provision} at ${transaction.date} (exchange rate: ${transaction.stockPriceExchangeRate.value})"
     )
 
   // Show.fromToString
-  implicit val instantShow: Show[Instant] = Show.fromToString
+  given instantShow: Show[Instant] = Show.fromToString
 }

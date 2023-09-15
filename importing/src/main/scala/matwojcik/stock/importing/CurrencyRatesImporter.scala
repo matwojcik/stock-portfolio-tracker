@@ -16,7 +16,7 @@ trait CurrencyRatesImporter[F[_]] {
 
 object CurrencyRatesImporter {
 
-  def apply[F[_]](implicit ev: CurrencyRatesImporter[F]): CurrencyRatesImporter[F] = ev
+  def apply[F[_]](using ev: CurrencyRatesImporter[F]): CurrencyRatesImporter[F] = ev
 
   // Imports PLN rates from NBP CSVs: https://www.nbp.pl/home.aspx?f=/kursy/arch_a.html
   def nbpInstance[F[_]: Sync]: CurrencyRatesImporter[F] =
@@ -46,11 +46,11 @@ object CurrencyRatesImporter {
   case class CurrencyRatesRow(date: LocalDate, eur: BigDecimal, gbp: BigDecimal, usd: BigDecimal, chf: BigDecimal)
 
   object CurrencyRatesRow {
-    implicit val localDateDecoder: CellDecoder[LocalDate] =
+    given localDateDecoder: CellDecoder[LocalDate] =
       CellDecoder.from(s => DecodeResult(LocalDate.parse(s, DateTimeFormatter.ofPattern("yyyyMMdd"))))
-    implicit val bigDecimalDecoder: CellDecoder[BigDecimal] =
+    given bigDecimalDecoder: CellDecoder[BigDecimal] =
       CellDecoder.from(s => DecodeResult(BigDecimal(s.replace(',', '.'))))
-    implicit val decoder: HeaderDecoder[CurrencyRatesRow] =
+    given decoder: HeaderDecoder[CurrencyRatesRow] =
       HeaderDecoder.decoder("data", "1EUR", "1GBP", "1USD", "1CHF")(CurrencyRatesRow.apply)
   }
 

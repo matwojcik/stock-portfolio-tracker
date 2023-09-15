@@ -18,12 +18,12 @@ trait PortfolioRepository[F[_]] {
 }
 
 object PortfolioRepository {
-  def apply[F[_]](implicit ev: PortfolioRepository[F]): PortfolioRepository[F] = ev
+  def apply[F[_]](using ev: PortfolioRepository[F]): PortfolioRepository[F] = ev
 
   type DomainEvents = Chain[PortfolioDomainEvent]
   type EventLog[F[_]] = Stateful[F, DomainEvents]
 
-  def memory[F[_]: Sync](implicit Events: EventLog[F]): PortfolioRepository[F] =
+  def memory[F[_]: Sync](using Events: EventLog[F]): PortfolioRepository[F] =
     new PortfolioRepository[F] {
 
       override def find(id: Portfolio.Id): F[Option[Portfolio]] =
@@ -48,7 +48,7 @@ object PortfolioRepository {
     }
 
   class RefStateful[F[_]: Monad, S](ref: Ref[F, S]) extends Stateful[F, S] {
-    val monad: Monad[F] = implicitly
+    val monad: Monad[F] = summon
     def get: F[S] = ref.get
     def set(s: S): F[Unit] = ref.set(s)
     override def inspect[A](f: S => A): F[A] = ref.get.map(f)
@@ -59,7 +59,7 @@ object PortfolioRepository {
     for {
       ref  <- Ref.of[F, DomainEvents](initial)
       repo <- {
-        implicit val r: RefStateful[F, DomainEvents] = new RefStateful(ref)
+        given r: RefStateful[F, DomainEvents] = new RefStateful(ref)
         Sync[F].delay(memory[F])
       }
     } yield repo

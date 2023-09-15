@@ -11,8 +11,8 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 
 class IncomeCalculatorSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
-  implicit val sp: SoldPositions[IO] = SoldPositions.instance[IO]
-  implicit val calculator: IncomeCalculator[IO] = IncomeCalculator.instance[IO]
+  given sp: SoldPositions[IO] = SoldPositions.instance[IO]
+  given calculator: IncomeCalculator[IO] = IncomeCalculator.instance[IO]
 
   Feature("Calculating income") {
     Scenario("No transactions in year") {

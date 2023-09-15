@@ -43,7 +43,7 @@ case class TransactionRow(
 }
 
 object TransactionRow {
-  implicit val localDateDecoder: CellDecoder[LocalDate] =
+  given localDateDecoder: CellDecoder[LocalDate] =
     CellDecoder.from(s => DecodeResult(LocalDate.parse(s, DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-  implicit val decoder: RowDecoder[TransactionRow] = RowDecoder.decoder(18, 0, 1, 3, 4, 6, 7, 8, 14, 15)(TransactionRow.apply)
+  given decoder: RowDecoder[TransactionRow] = RowDecoder.decoder(18, 0, 1, 3, 4, 6, 7, 8, 14, 15)(TransactionRow.apply)
 }

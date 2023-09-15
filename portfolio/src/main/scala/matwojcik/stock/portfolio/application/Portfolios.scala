@@ -20,7 +20,7 @@ trait Portfolios[F[_]] {
 }
 
 object Portfolios {
-  def apply[F[_]](implicit ev: Portfolios[F]): Portfolios[F] = ev
+  def apply[F[_]](using ev: Portfolios[F]): Portfolios[F] = ev
 
   def instance[F[_]: PortfolioRepository: Sync]: Portfolios[F] = new Portfolios[F] {
     private val logger = Slf4jLogger.getLoggerFromClass[F](getClass())

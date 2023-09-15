@@ -7,5 +7,5 @@ trait TransactionRepository[F[_]] {
 }
 
 object TransactionRepository {
-  def apply[F[_]](implicit ev: TransactionRepository[F]): TransactionRepository[F] = ev
+  def apply[F[_]](using ev: TransactionRepository[F]): TransactionRepository[F] = ev
 }

@@ -10,5 +10,5 @@ trait Currencies[F[_]] {
 }
 
 object Currencies {
-  def apply[F[_]](implicit ev: Currencies[F]): Currencies[F] = ev
+  def apply[F[_]](using ev: Currencies[F]): Currencies[F] = ev
 }

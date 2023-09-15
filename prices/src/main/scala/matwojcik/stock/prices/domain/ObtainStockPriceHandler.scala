@@ -7,7 +7,7 @@ trait ObtainStockPriceHandler[F[_]] {
 }
 
 object ObtainStockPriceHandler {
-  def apply[F[_]](implicit ev: ObtainStockPriceHandler[F]): ObtainStockPriceHandler[F] = ev
+  def apply[F[_]](using ev: ObtainStockPriceHandler[F]): ObtainStockPriceHandler[F] = ev
 }
 
 sealed trait ObtainStockPriceCommand extends Product with Serializable

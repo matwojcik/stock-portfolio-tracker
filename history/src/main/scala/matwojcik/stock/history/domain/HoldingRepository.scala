@@ -12,7 +12,7 @@ trait HoldingRepository[F[_]] {
 }
 
 object HoldingRepository {
-  def apply[F[_]](implicit ev: HoldingRepository[F]): HoldingRepository[F] = ev
+  def apply[F[_]](using ev: HoldingRepository[F]): HoldingRepository[F] = ev
 
 }
 

@@ -13,7 +13,7 @@ trait IncomeCalculator[F[_]] {
 }
 
 object IncomeCalculator {
-  def apply[F[_]](implicit ev: IncomeCalculator[F]): IncomeCalculator[F] = ev
+  def apply[F[_]](using ev: IncomeCalculator[F]): IncomeCalculator[F] = ev
 
   def instance[F[_]: SoldPositions: Monad]: IncomeCalculator[F] =
     new IncomeCalculator[F] {
