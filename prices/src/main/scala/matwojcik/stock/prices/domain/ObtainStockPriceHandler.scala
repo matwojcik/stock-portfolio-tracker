@@ -10,9 +10,6 @@ object ObtainStockPriceHandler {
   def apply[F[_]](using ev: ObtainStockPriceHandler[F]): ObtainStockPriceHandler[F] = ev
 }
 
-sealed trait ObtainStockPriceCommand extends Product with Serializable
-
-object ObtainStockPriceCommand {
-  case object ObtainAllStockPrices extends ObtainStockPriceCommand
-  case class ObtainStockFor(id: Stock.Id, protfolios: Portfolio.Id) extends ObtainStockPriceCommand
-}
+enum ObtainStockPriceCommand:
+  case ObtainAllStockPrices
+  case ObtainStockFor(id: Stock.Id, protfolios: Portfolio.Id)

@@ -4,6 +4,7 @@ import cats.kernel.Monoid
 import matwojcik.stock.domain.Stock.Quantity
 
 import scala.math.BigDecimal.RoundingMode
+import scala.annotation.targetName
 
 object domain {
 
@@ -12,6 +13,10 @@ object domain {
 
     object Id {
       def apply(value: String): Id = value
+    }
+
+    extension (value: Id) {
+      def value: String = value
     }
 
     opaque type Quantity = Int
@@ -31,6 +36,11 @@ object domain {
 
     object Exchange {
       def apply(value: String): Exchange = value
+    }
+
+    extension (value: Exchange) {
+      @targetName("exchangeValue")
+      def value: String = value
     }
 
   }

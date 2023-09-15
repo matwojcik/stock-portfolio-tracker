@@ -103,13 +103,10 @@ object Portfolio {
 
   }
 
-  sealed trait PortfolioRecreationFailure extends Product with Serializable
-
-  object PortfolioRecreationFailure {
-    case class DuplicateCreationEvent(event: PortfolioCreated) extends PortfolioRecreationFailure
-    case class EventNotFromPortfolio(event: PortfolioDomainEvent) extends PortfolioRecreationFailure
-    case class DomainFailure(reason: NotEnoughBalance) extends PortfolioRecreationFailure
-  }
+  enum PortfolioRecreationFailure:
+    case DuplicateCreationEvent(event: PortfolioCreated)
+    case EventNotFromPortfolio(event: PortfolioDomainEvent)
+    case DomainFailure(reason: NotEnoughBalance)
 
   case class Id(value: String)
 
