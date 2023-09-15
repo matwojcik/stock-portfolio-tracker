@@ -56,7 +56,6 @@ case class Portfolio private (id: Portfolio.Id, currency: Currency, private val 
 
   def activeHoldings: List[Holding] = holdings.values.toList
 
-  private def copy(): Unit = ()
 }
 
 object Portfolio {
@@ -72,7 +71,7 @@ object Portfolio {
           DuplicateCreationEvent(e).asLeft[Portfolio]
         case e @ PortfolioDomainEvent.TransactionAdded(id, transaction) =>
           if (id == portfolio.id)
-            portfolio.addTransaction(transaction).leftMap(DomainFailure)
+            portfolio.addTransaction(transaction).leftMap(DomainFailure(_))
           else
             EventNotFromPortfolio(e).asLeft[Portfolio]
         case e @ CurrencyChanged(portfolioId, currency)                 =>

@@ -1,7 +1,6 @@
 package matwojcik.stock
 
 import cats.kernel.Monoid
-import cats.kernel.Semigroup
 import matwojcik.stock.domain.Stock.Quantity
 
 import scala.math.BigDecimal.RoundingMode

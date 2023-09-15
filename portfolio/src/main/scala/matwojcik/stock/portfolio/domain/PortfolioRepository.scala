@@ -7,9 +7,6 @@ import cats.mtl.Stateful
 import cats.implicits._
 import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent
 import matwojcik.stock.portfolio.domain.events.PortfolioDomainEvent.PortfolioCreated
-import cats.Functor
-import cats.mtl.Tell
-import cats.kernel.Semigroup
 import cats.Monad
 
 trait PortfolioRepository[F[_]] {

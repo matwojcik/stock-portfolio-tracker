@@ -8,3 +8,4 @@ project/plugins/project/
 .bsp
 .vscode
 metals.sbt
+.DS_Store

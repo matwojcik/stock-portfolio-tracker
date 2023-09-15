@@ -2,10 +2,7 @@ package matwojcik.stock.taxes.domain
 
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import TestTransactions._
-import cats.Id
-import cats.implicits._
 import cats.data.NonEmptyList
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
