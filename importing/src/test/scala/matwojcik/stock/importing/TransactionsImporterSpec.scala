@@ -10,7 +10,7 @@ import java.io.File
 
 class TransactionsImporterSpec  extends AnyFeatureSpec with Matchers with GivenWhenThen{
 
-  val importer = TransactionsImporter.instance[IO]
+  val importer: TransactionsImporter[IO] = TransactionsImporter.instance[IO]
 
   Scenario("easy ready") {
     importer.readTransactions(new File("/Users/mateusz.wojcik/Downloads/Transactions (2).csv").toURI.toURL).unsafeRunSync().foreach(println)

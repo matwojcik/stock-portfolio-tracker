@@ -15,7 +15,7 @@ trait TransactionsImporter[F[_]] {
 object TransactionsImporter {
   def apply[F[_]](implicit ev: TransactionsImporter[F]): TransactionsImporter[F] = ev
 
-  def instance[F[_]: Sync] =
+  def instance[F[_]: Sync]: TransactionsImporter[F] =
     new TransactionsImporter[F] {
 
       override def readTransactions(url: URL): F[List[Transaction]] =
