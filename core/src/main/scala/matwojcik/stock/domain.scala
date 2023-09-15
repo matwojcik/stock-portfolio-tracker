@@ -8,20 +8,48 @@ import scala.math.BigDecimal.RoundingMode
 object domain {
 
   object Stock {
-    case class Id(value: String)
+    opaque type Id = String
 
-    case class Quantity(value: Int) {
-      def plus(other: Quantity): Quantity = Quantity(value + other.value)
-      def minus(other: Quantity): Quantity = Quantity(value - other.value)
-      def >=(other: Quantity): Boolean = value >= other.value
+    object Id {
+      def apply(value: String): Id = value
     }
 
-    case class Exchange(value: String)
+    opaque type Quantity = Int
+
+    object Quantity {
+      def apply(value: Int): Quantity = value
+    }
+
+    extension (value: Quantity) {
+      def plus(other: Quantity): Quantity = value + other
+      def minus(other: Quantity): Quantity = value - other
+      def >=(other: Quantity): Boolean = value >= other
+      def value: Int = value
+    }
+
+    opaque type Exchange = String
+
+    object Exchange {
+      def apply(value: String): Exchange = value
+    }
 
   }
 
-  case class Currency(id: String)
-  case class CurrencyRate(value: BigDecimal)
+  opaque type Currency = String
+
+  object Currency {
+    def apply(value: String): Currency = value
+  }
+
+  opaque type CurrencyRate = BigDecimal
+
+  object CurrencyRate {
+    def apply(value: BigDecimal): CurrencyRate = value
+  }
+
+  extension (cr: CurrencyRate) {
+    def value: BigDecimal = cr.bigDecimal
+  }
 
   case class Money(value: BigDecimal, currency: Currency) {
     def *(quantity: Quantity): Money = Money(quantity.value * value, currency)
