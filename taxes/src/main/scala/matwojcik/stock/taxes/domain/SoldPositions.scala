@@ -14,7 +14,7 @@ trait SoldPositions[F[_]] {
 }
 
 object SoldPositions {
-  def apply[F[_]](implicit ev: SoldPositions[F]): SoldPositions[F] = ev
+  def apply[F[_]](using ev: SoldPositions[F]): SoldPositions[F] = ev
 
   def instance[F[_]: Applicative]: SoldPositions[F] =
     new SoldPositions[F] {

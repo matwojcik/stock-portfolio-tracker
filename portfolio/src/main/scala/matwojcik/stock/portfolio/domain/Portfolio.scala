@@ -87,10 +87,10 @@ object Portfolio {
 
     type EventLog[F[_]] = Tell[F, Chain[PortfolioDomainEvent]]
 
-    def create[F[_]: Functor](id: Portfolio.Id, currency: Currency)(implicit Events: EventLog[F]): F[Portfolio] =
+    def create[F[_]: Functor](id: Portfolio.Id, currency: Currency)(using Events: EventLog[F]): F[Portfolio] =
       Events.tell(Chain.one(PortfolioCreated(id, currency))).as(Portfolio.empty(id, currency))
 
-    def changeCurrency[F[_]: Functor](portfolio: Portfolio)(newCurrency: Currency)(implicit Events: EventLog[F]): F[Portfolio] =
+    def changeCurrency[F[_]: Functor](portfolio: Portfolio)(newCurrency: Currency)(using Events: EventLog[F]): F[Portfolio] =
       Events.tell(Chain.one(CurrencyChanged(portfolio.id, newCurrency))).as(portfolio.changeCurrency(newCurrency))
 
     def addTransaction[F[_]: Functor](

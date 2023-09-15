@@ -8,5 +8,5 @@ trait HoldingHistoryRepository[F[_]] {
 }
 
 object HoldingHistoryRepository {
-  def apply[F[_]](implicit ev: HoldingHistoryRepository[F]): HoldingHistoryRepository[F] = ev
+  def apply[F[_]](using ev: HoldingHistoryRepository[F]): HoldingHistoryRepository[F] = ev
 }

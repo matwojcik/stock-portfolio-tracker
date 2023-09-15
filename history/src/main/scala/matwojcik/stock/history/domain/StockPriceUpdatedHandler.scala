@@ -16,7 +16,7 @@ trait StockPriceUpdatedHandler[F[_]] {
 }
 
 object StockPriceUpdatedHandler {
-  def apply[F[_]](implicit ev: StockPriceUpdatedHandler[F]): StockPriceUpdatedHandler[F] = ev
+  def apply[F[_]](using ev: StockPriceUpdatedHandler[F]): StockPriceUpdatedHandler[F] = ev
 
   def instance[F[_]: Currencies: HoldingRepository: PortfolioRepository: HoldingHistoryRepository: Monad]: StockPriceUpdatedHandler[F] =
     new StockPriceUpdatedHandler[F] {

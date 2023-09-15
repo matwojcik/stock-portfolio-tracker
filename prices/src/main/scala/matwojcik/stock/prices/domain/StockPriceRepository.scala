@@ -10,5 +10,5 @@ trait StockPriceRepository[F[_]] {
 }
 
 object StockPriceRepository {
-  def apply[F[_]](implicit ev: StockPriceRepository[F]): StockPriceRepository[F] = ev
+  def apply[F[_]](using ev: StockPriceRepository[F]): StockPriceRepository[F] = ev
 }

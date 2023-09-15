@@ -9,7 +9,7 @@ trait PortfolioStockRepository[F[_]] {
 }
 
 object PortfolioStockRepository {
-  def apply[F[_]](implicit ev: PortfolioStockRepository[F]): PortfolioStockRepository[F] = ev
+  def apply[F[_]](using ev: PortfolioStockRepository[F]): PortfolioStockRepository[F] = ev
 }
 
 case class StockPortfolios(stock: Stock.Id, portfolios: NonEmptySet[Portfolio.Id])

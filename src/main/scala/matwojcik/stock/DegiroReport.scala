@@ -21,7 +21,7 @@ trait DegiroReport[F[_]] {
 }
 
 object DegiroReport {
-  def apply[F[_]](implicit ev: DegiroReport[F]): DegiroReport[F] = ev
+  def apply[F[_]](using ev: DegiroReport[F]): DegiroReport[F] = ev
 
   private val polishZone: ZoneId = ZoneId.of("Europe/Warsaw")
   private val PLN: Currency = Currency("PLN")

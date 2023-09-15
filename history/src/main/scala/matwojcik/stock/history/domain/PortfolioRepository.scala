@@ -7,5 +7,5 @@ trait PortfolioRepository[F[_]] {
 }
 
 object PortfolioRepository {
-  def apply[F[_]](implicit ev: PortfolioRepository[F]): PortfolioRepository[F] = ev
+  def apply[F[_]](using ev: PortfolioRepository[F]): PortfolioRepository[F] = ev
 }
