@@ -34,7 +34,7 @@ object PortfolioRepository {
                 .fromEvents(creation, rest)
                 .fold(
                   failure => Sync[F].raiseError(new IllegalStateException(s"Invalid portfolio state due to: $failure, events: $events")),
-                  _.some.pure[F]
+                  portfolio => portfolio.some.pure[F]
                 )
             case notCreationEvent :: rest =>
               Sync[F].raiseError(new IllegalStateException(s"Illegal portfolio state, first event is not creation: $events"))
@@ -58,7 +58,7 @@ object PortfolioRepository {
   def ref[F[_]: Sync](initial: DomainEvents = Chain.empty): F[PortfolioRepository[F]] =
     for {
       ref  <- Ref.of[F, DomainEvents](initial)
-      repo <- { implicit val r = new RefStateful(ref)
+      repo <- { implicit val r: RefStateful[F,DomainEvents] = new RefStateful(ref)
         Sync[F].delay(memory[F])
       }
     } yield repo

@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
-  scalaVersion := "2.13.11"
-  // scalaVersion := "3.3.0"
+  // scalaVersion := "2.13.11"
+  scalaVersion := "3.3.1"
 )
 
 val compilerPlugins = Seq(
@@ -131,12 +131,11 @@ lazy val importing = (project in file("importing"))
     commonSettings,
     compilerPlugins,
     compilerOptions,
-    coreDependencies,
     testSettings,
     libraryDependencies ++= Seq(
       "com.nrinaudo" %% "kantan.csv-java8",
       // "com.nrinaudo" %% "kantan.csv-cats",
-      "com.nrinaudo" %% "kantan.csv-generic",
+      // "com.nrinaudo" %% "kantan.csv-generic",
       // "com.nrinaudo" %% "kantan.csv-refined"
     ).map(_ % "0.6.1").map(_ cross CrossVersion.for3Use2_13)
   )
