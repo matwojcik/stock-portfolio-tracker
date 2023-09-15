@@ -8,7 +8,7 @@ import cats.effect.unsafe.implicits.global
 
 import java.io.File
 
-class TransactionsImporterSpec  extends AnyFeatureSpec with Matchers with GivenWhenThen{
+class TransactionsImporterSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
 
   val importer: TransactionsImporter[IO] = TransactionsImporter.instance[IO]
 

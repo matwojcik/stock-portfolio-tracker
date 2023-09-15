@@ -46,7 +46,7 @@ class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
 
     result.foreach(income => println(income.show))
 
-    def printSum(name: String)(income: List[Income])(f: Income => Money) = 
+    def printSum(name: String)(income: List[Income])(f: Income => Money) =
       println(s"$name: " + income.map(f).combineAll(Money.monoid.plus(Currency("PLN"))))
 
     def printReport(incomes: List[Income]) = {
@@ -55,11 +55,10 @@ class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
       printSum("Total cost")(incomes)(_.soldPosition.totalCost(Currency("PLN")))
     }
 
-    result.groupBy(_.soldPosition.sellTransaction.exchange).foreach {
-      case (exchange, value) =>
-        println(s"StockExchange: $exchange")
-        printReport(value)
-        println("------------")
+    result.groupBy(_.soldPosition.sellTransaction.exchange).foreach { case (exchange, value) =>
+      println(s"StockExchange: $exchange")
+      printReport(value)
+      println("------------")
     }
 
     println(s"Total")
@@ -68,17 +67,23 @@ class DegiroReportSpec extends AnyFeatureSpec with Matchers with GivenWhenThen {
 
   }
 
-  implicit val incomeShow: Show[Income] = Show.show {
-    case Income(date, value, soldPosition) =>
-      show"""Income at $date for ${soldPosition.sellTransaction.stock.value} at ${soldPosition.sellTransaction.exchange.value}: $value  (exchange rate: ${soldPosition.sellTransaction.stockPriceExchangeRate.value})
+  implicit val incomeShow: Show[Income] = Show.show { case Income(date, value, soldPosition) =>
+    show"""Income at $date for ${soldPosition.sellTransaction.stock.value} at ${soldPosition
+           .sellTransaction
+           .exchange
+           .value}: $value  (exchange rate: ${soldPosition.sellTransaction.stockPriceExchangeRate.value})
             |Sell: ${soldPosition.sellTransaction}
             |Buys:
             |""".stripMargin ++ soldPosition.buyTransactions.map(t => show"$t").reduceLeft(_ ++ "\n" ++ _) ++ "\n"
   }
 
   implicit val moneyShow: Show[Money] = Show.show(money => s"${money.value} ${money.currency}")
-  implicit val transactionShow: Show[Transaction] = 
-    Show.show(transaction => show"${transaction.quantity.value} shares for ${transaction.stockPrice} with provision ${transaction.provision} at ${transaction.date} (exchange rate: ${transaction.stockPriceExchangeRate.value})")
-    // Show.fromToString
+
+  implicit val transactionShow: Show[Transaction] =
+    Show.show(transaction =>
+      show"${transaction.quantity.value} shares for ${transaction.stockPrice} with provision ${transaction.provision} at ${transaction.date} (exchange rate: ${transaction.stockPriceExchangeRate.value})"
+    )
+
+  // Show.fromToString
   implicit val instantShow: Show[Instant] = Show.fromToString
 }

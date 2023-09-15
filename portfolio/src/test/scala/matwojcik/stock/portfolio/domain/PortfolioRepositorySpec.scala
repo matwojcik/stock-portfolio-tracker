@@ -30,7 +30,7 @@ class PortfolioRepositorySpec extends AnyFeatureSpec with Matchers with GivenWhe
 
         for {
           portfolio <- repository.find(portfolioId)
-        } yield portfolio shouldBe (empty)
+        } yield portfolio shouldBe empty
       }
     }
 
@@ -41,7 +41,7 @@ class PortfolioRepositorySpec extends AnyFeatureSpec with Matchers with GivenWhe
         for {
           _         <- repository.store(PortfolioCreated(Portfolio.Id("OTHER"), PLN))
           portfolio <- repository.find(portfolioId)
-        } yield portfolio shouldBe (empty)
+        } yield portfolio shouldBe empty
       }
     }
 
@@ -61,7 +61,7 @@ class PortfolioRepositorySpec extends AnyFeatureSpec with Matchers with GivenWhe
         Given("Empty repository")
 
         for {
-          _ <- repository.store(PortfolioCreated(portfolioId, PLN))
+          _         <- repository.store(PortfolioCreated(portfolioId, PLN))
           transaction1 = Transaction(Transaction.Id("1"), Stock.Id("MNU"), Transaction.Type.Buy, Quantity(10), someDate)
           transaction2 = Transaction(Transaction.Id("2"), Stock.Id("MNU"), Transaction.Type.Sell, Quantity(3), someDate)
           _         <- repository.store(TransactionAdded(portfolioId, transaction1))
@@ -77,7 +77,7 @@ class PortfolioRepositorySpec extends AnyFeatureSpec with Matchers with GivenWhe
     Scenario("Incorrect transactions") {
       withEmptyRepo { repository =>
         val result = for {
-          _ <- repository.store(PortfolioCreated(portfolioId, PLN))
+          _         <- repository.store(PortfolioCreated(portfolioId, PLN))
           transaction = Transaction(Transaction.Id("2"), Stock.Id("MNU"), Transaction.Type.Sell, Quantity(3), someDate)
           _         <- repository.store(TransactionAdded(portfolioId, transaction))
           portfolio <- repository.find(portfolioId)

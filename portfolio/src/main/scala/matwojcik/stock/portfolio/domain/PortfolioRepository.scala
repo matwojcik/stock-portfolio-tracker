@@ -36,9 +36,9 @@ object PortfolioRepository {
                   failure => Sync[F].raiseError(new IllegalStateException(s"Invalid portfolio state due to: $failure, events: $events")),
                   portfolio => portfolio.some.pure[F]
                 )
-            case notCreationEvent :: rest =>
+            case notCreationEvent :: rest             =>
               Sync[F].raiseError(new IllegalStateException(s"Illegal portfolio state, first event is not creation: $events"))
-            case Nil =>
+            case Nil                                  =>
               none[Portfolio].pure[F]
           }
         }
@@ -58,8 +58,10 @@ object PortfolioRepository {
   def ref[F[_]: Sync](initial: DomainEvents = Chain.empty): F[PortfolioRepository[F]] =
     for {
       ref  <- Ref.of[F, DomainEvents](initial)
-      repo <- { implicit val r: RefStateful[F,DomainEvents] = new RefStateful(ref)
+      repo <- {
+        implicit val r: RefStateful[F, DomainEvents] = new RefStateful(ref)
         Sync[F].delay(memory[F])
       }
     } yield repo
+
 }

@@ -23,12 +23,12 @@ object StockPriceUpdatedHandler {
 
       override def handleStockPriceUpdated(event: StockPriceUpdated): F[Either[StockPriceUpdateFailure, Unit]] = {
         for {
-          holding           <- HoldingRepository[F].findHoldingAt(event.portfolio, event.stock, event.date).toEitherT(NotFound(event.portfolio))
+          holding <- HoldingRepository[F].findHoldingAt(event.portfolio, event.stock, event.date).toEitherT(NotFound(event.portfolio))
           portfolioCurrency <- PortfolioRepository[F].findCurrencyOfPortfolio(event.portfolio).toEitherT(NotFound(event.portfolio))
-          currencyRate <- Currencies[F]
-                           .findCurrencyRate(event.price.currency, portfolioCurrency, event.date)
-                           .liftToEitherT[StockPriceUpdateFailure]
-          _ <- storeHoldingHistory(event, holding, portfolioCurrency, currencyRate)
+          currencyRate      <- Currencies[F]
+                                 .findCurrencyRate(event.price.currency, portfolioCurrency, event.date)
+                                 .liftToEitherT[StockPriceUpdateFailure]
+          _                 <- storeHoldingHistory(event, holding, portfolioCurrency, currencyRate)
         } yield ()
       }.value
 
@@ -50,6 +50,7 @@ object StockPriceUpdatedHandler {
         )
         HoldingHistoryRepository[F].store(history).liftToEitherT[StockPriceUpdateFailure]
       }
+
     }
 
   object failures {
@@ -58,6 +59,7 @@ object StockPriceUpdatedHandler {
     object StockPriceUpdateFailure {
       case class NotFound(id: Portfolio.Id) extends StockPriceUpdateFailure
     }
+
   }
 
 }
